@@ -10,10 +10,7 @@ export default class HomeScreen extends Component{
         let user = firebase.auth().currentUser;
         if(user !== null){            
             store.dispatch(userAction.Setup(user.uid , user.displayName));
-            console.log("User ID : " + user.uid);
-            firebase.database().ref("Users/" + user.uid + "/").once('value', (snapshot) => {
-                console.log(JSON.stringify(snapshot.val()));
-            });
+            GetUserCID(user.uid);
             this.props.navigation.navigate('Home');
         }else{
             this.props.navigation.navigate('Login');

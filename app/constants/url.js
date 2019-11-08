@@ -1,1 +1,1 @@
-export const MESSAGE_URL = "Conversation/SimpleIDHere"
+export const MESSAGE_URL = "Conversation/"

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-nativ
 import firebase from 'react-native-firebase';
 import store from '../redux/store';
 import { MESSAGE_URL } from '../constants/url';
+import {asyncGetUserCID} from '../util/UserSetup';
 
 class MessageDetail extends React.Component {
     render() {
@@ -39,21 +40,23 @@ export default class HomeScreen extends React.Component {
                 "SendBy": state.users.accountId,
                 "DateTime": date_nw
             }
-            firebase.database().ref(MESSAGE_URL + "/" + date_nw.toString()).set({
+            firebase.database().ref(MESSAGE_URL+ state.users.conversationID + "/" + date_nw.toString()).set({
                 message: message_send
             });
         }
 
     }
     componentDidMount() {
-        let one_week_ago = new Date();
+        const state=store.getState();
+        //console.log("User ID : " + state.users.accountId);
+        asyncGetUserCID(state.users.accountId).then((CID)=>{
+            let one_week_ago = new Date();
         one_week_ago.setDate(one_week_ago.getDate() - 7);
         var to_milli = one_week_ago.getTime();
-
-        firebase.database().ref(MESSAGE_URL).once('value', (snapshot) => {
+        CID = "\"" + CID + "\"";
+            firebase.database().ref(MESSAGE_URL +CID ).once('value', (snapshot) => {
             let temp_arr = [];
-
-            if (snapshot.val()) {
+            if (snapshot.val()) { 
                 let keys = Object.keys(snapshot.toJSON());
                 keys.filter((key) => {
                     return parseInt(key) > to_milli;
@@ -68,8 +71,9 @@ export default class HomeScreen extends React.Component {
         });
 
 
-        firebase.database().ref(MESSAGE_URL).on('child_added', (snapshot) => {
+        firebase.database().ref(MESSAGE_URL + CID).on('child_added', (snapshot) => {
             if (snapshot.exists()) {
+                console.log("Added");
                 let key = Object.keys(snapshot.toJSON())[0];
                 //alert(key);
                 if (parseInt(snapshot.toJSON()[key]["DateTime"]) > one_week_ago.getTime()) {
@@ -79,6 +83,8 @@ export default class HomeScreen extends React.Component {
 
             }
         })
+        })
+        
     }
     render() {
         return (
