@@ -1,17 +1,36 @@
 import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native'
 import firebase from 'react-native-firebase';
 import store from '../redux/store';
 import { MESSAGE_URL } from '../constants/url';
-import {asyncGetUserCID} from '../util/UserSetup';
+import { asyncGetUserCID } from '../util/UserSetup';
 
 class MessageDetail extends React.Component {
+    state = {
+        UserId: ''
+    }
+    componentDidMount() {
+        const state = store.getState();
+        this.setState({ UserId: state.users.accountId });
+        console.log(state.users.accountId);
+    }
     render() {
-        return (
-            <View>
-                <Text>{this.props.message_detail.message.Detail}</Text>
-            </View>
-        )
+        if (this.props.message_detail.message.SendBy === this.state.UserId) {
+            //self
+            return (
+                <View style={styles.SelfTextContainer}>
+                    <Text>{this.props.message_detail.message.Detail}</Text>
+                </View>
+            )
+        } else {
+            //oppo
+            return (
+                <View style={styles.OpoTextContainer}>
+                    <Text>{this.props.message_detail.message.Detail}</Text>
+                </View>
+            )
+        }
+
     }
 }
 
@@ -31,7 +50,7 @@ export default class HomeScreen extends React.Component {
      * var date = new Date(inmillisecond)
      */
     sendMessage = () => {
-        const state=store.getState();
+        const state = store.getState();
         if (this.state.message != "") {
             let date_nw = new Date().getTime();
             let message_send = {
@@ -40,68 +59,74 @@ export default class HomeScreen extends React.Component {
                 "SendBy": state.users.accountId,
                 "DateTime": date_nw
             }
-            firebase.database().ref(MESSAGE_URL+ state.users.conversationID + "/" + date_nw.toString()).set({
+            firebase.database().ref(MESSAGE_URL + state.users.conversationID + "/" + date_nw.toString()).set({
                 message: message_send
             });
         }
 
     }
     componentDidMount() {
-        const state=store.getState();
+        const state = store.getState();
         //console.log("User ID : " + state.users.accountId);
-        asyncGetUserCID(state.users.accountId).then((CID)=>{
+        asyncGetUserCID(state.users.accountId).then((CID) => {
             let one_week_ago = new Date();
-        one_week_ago.setDate(one_week_ago.getDate() - 7);
-        var to_milli = one_week_ago.getTime();
-        CID = "\"" + CID + "\"";
-            firebase.database().ref(MESSAGE_URL +CID ).once('value', (snapshot) => {
-            let temp_arr = [];
-            if (snapshot.val()) { 
-                let keys = Object.keys(snapshot.toJSON());
-                keys.filter((key) => {
-                    return parseInt(key) > to_milli;
-                }).sort((key_a, key_b) => {
-                    return parseInt(key_a) < parseInt(key_b);
-                }).map((key) => {
-                    temp_arr.push(snapshot.toJSON()[key.toString()]);
-                });
+            one_week_ago.setDate(one_week_ago.getDate() - 7);
+            var to_milli = one_week_ago.getTime();
+            CID = "\"" + CID + "\"";
+            firebase.database().ref(MESSAGE_URL + CID).once('value', (snapshot) => {
+                let temp_arr = [];
+                if (snapshot.val()) {
+                    let keys = Object.keys(snapshot.toJSON());
+                    keys.filter((key) => {
+                        return parseInt(key) > to_milli;
+                    }).sort((key_a, key_b) => {
+                        return parseInt(key_a) < parseInt(key_b);
+                    }).map((key) => {
+                        temp_arr.push(snapshot.toJSON()[key.toString()]);
+                    });
 
-                this.setState({ chat_message: temp_arr });
-            }
-        });
-
-
-        firebase.database().ref(MESSAGE_URL + CID).on('child_added', (snapshot) => {
-            if (snapshot.exists()) {
-                console.log("Added");
-                let key = Object.keys(snapshot.toJSON())[0];
-                //alert(key);
-                if (parseInt(snapshot.toJSON()[key]["DateTime"]) > one_week_ago.getTime()) {
-                    this.state.chat_message = [snapshot.toJSON()].concat(this.state.chat_message);
-                    this.setState({ chat_message: this.state.chat_message });
+                    this.setState({ chat_message: temp_arr });
                 }
+            });
 
-            }
+
+            firebase.database().ref(MESSAGE_URL + CID).on('child_added', (snapshot) => {
+                if (snapshot.exists()) {
+                    console.log("Added");
+                    let key = Object.keys(snapshot.toJSON())[0];
+                    //alert(key);
+                    if (parseInt(snapshot.toJSON()[key]["DateTime"]) > one_week_ago.getTime()) {
+                        this.state.chat_message = [snapshot.toJSON()].concat(this.state.chat_message);
+                        this.setState({ chat_message: this.state.chat_message });
+                    }
+
+                }
+            })
         })
-        })
-        
+
     }
     render() {
         return (
             <View style={styles.container}>
-                <View style={styles.messageContainer}>
-                    {
-                        this.state.chat_message.map((message_detail) =>
-                            <MessageDetail message_detail={message_detail} key={message_detail.message.DateTime}/>
-                        )
-                    }
-                </View>
-                <View style={styles.senderContainer}>
-                    <TextInput style={styles.textinput} value={this.state.message} onChangeText={(text) => { this.setState({ message: text }) }} />
-                    <TouchableOpacity onPress={this.sendMessage}>
-                        <Text>SEND</Text>
-                    </TouchableOpacity>
-                </View>
+                <ScrollView>
+                    <View style={styles.container}>
+
+                        <View style={styles.messageContainer}>
+                            {
+                                this.state.chat_message.map((message_detail) =>
+                                    <MessageDetail message_detail={message_detail} key={message_detail.message.DateTime} />
+                                )
+                            }
+                        </View>
+                        <View style={styles.senderContainer}>
+                            <TextInput style={styles.textinput} value={this.state.message} onChangeText={(text) => { this.setState({ message: text }) }} />
+                            <TouchableOpacity onPress={this.sendMessage}>
+                                <Text>SEND</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                    </View>
+                </ScrollView>
             </View>
         )
     }
@@ -130,5 +155,13 @@ const styles = StyleSheet.create({
     SenderButton: {
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    SelfTextContainer: {
+        marginRight: '2%',
+        flexDirection: 'row-reverse'
+    },
+    OpoTextContainer: {
+        marginLeft: '2%',
+        flexDirection: 'row'
     }
 })
