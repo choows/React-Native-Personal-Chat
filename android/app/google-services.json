@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "253043089237",
+    "firebase_url": "https://dearapp-debe1.firebaseio.com",
+    "project_id": "dearapp-debe1",
+    "storage_bucket": "dearapp-debe1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:253043089237:android:faf3e62efe478e3dcc19dc",
+        "android_client_info": {
+          "package_name": "com.c.dearapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "253043089237-ai6so0oc5nvavudsopn85ikmd769i0df.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5z5x9B5eJXfjfvomMHd2a6Gb_aTuz-fM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "253043089237-ai6so0oc5nvavudsopn85ikmd769i0df.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "253043089237-tqanq2hoedc6cpncbuafbbet5p385sm2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.dearproject"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
