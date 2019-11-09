@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView , Image} from 'react-native'
 import firebase from 'react-native-firebase';
 import store from '../redux/store';
 import { MESSAGE_URL } from '../constants/url';
@@ -12,7 +12,7 @@ class MessageDetail extends React.Component {
     componentDidMount() {
         const state = store.getState();
         this.setState({ UserId: state.users.accountId });
-        console.log(state.users.accountId);
+        //console.log(state.users.accountId);
     }
     render() {
         if (this.props.message_detail.message.SendBy === this.state.UserId) {
@@ -61,6 +61,10 @@ export default class HomeScreen extends React.Component {
             }
             firebase.database().ref(MESSAGE_URL + state.users.conversationID + "/" + date_nw.toString()).set({
                 message: message_send
+            }).then(()=>{
+                this.setState({message : ''});
+            }).catch((err)=>{
+                console.log("Send Message Error : " + err);
             });
         }
 
@@ -105,28 +109,32 @@ export default class HomeScreen extends React.Component {
         })
 
     }
+    //scrollTo() used to scroll to latest news 
     render() {
         return (
             <View style={styles.container}>
-                <ScrollView>
-                    <View style={styles.container}>
-
-                        <View style={styles.messageContainer}>
+                <View style={styles.container}>
+                    <ScrollView style={{ height: '93%', width: '100%' }}
+                        ref={ref => this.scrollView = ref}
+                        onContentSizeChange={(contentWidth, contentHeight) => {
+                            this.scrollView.scrollToEnd({ animated: true });
+                        }}>
+                    <View style={[styles.messageContainer, { height: '100%' }]}>
                             {
                                 this.state.chat_message.map((message_detail) =>
                                     <MessageDetail message_detail={message_detail} key={message_detail.message.DateTime} />
                                 )
                             }
                         </View>
-                        <View style={styles.senderContainer}>
-                            <TextInput style={styles.textinput} value={this.state.message} onChangeText={(text) => { this.setState({ message: text }) }} />
-                            <TouchableOpacity onPress={this.sendMessage}>
-                                <Text>SEND</Text>
-                            </TouchableOpacity>
-                        </View>
-
+                    </ScrollView>
+                    <View style={styles.senderContainer}>
+                        <TextInput style={styles.textinput} value={this.state.message} onChangeText={(text) => { this.setState({ message: text }) }} />
+                        <TouchableOpacity onPress={this.sendMessage} style={{width : '20%' , height : '100%'}}>
+                            <Image source={require('../assets/arrow_icon.png')} style={{width : '100%' , height : '100%', resizeMode : 'contain'}}/>
+                        </TouchableOpacity>
                     </View>
-                </ScrollView>
+
+                </View>
             </View>
         )
     }
@@ -150,7 +158,8 @@ const styles = StyleSheet.create({
     textinput: {
         width: '80%',
         height: '100%',
-        borderColor: 0.3
+        borderColor: 'black',
+        borderWidth : 0.3,
     },
     SenderButton: {
         justifyContent: 'center',
@@ -158,7 +167,8 @@ const styles = StyleSheet.create({
     },
     SelfTextContainer: {
         marginRight: '2%',
-        flexDirection: 'row-reverse'
+        flexDirection: 'row-reverse',
+        paddingRight : 5
     },
     OpoTextContainer: {
         marginLeft: '2%',
