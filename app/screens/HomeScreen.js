@@ -96,7 +96,6 @@ export default class HomeScreen extends React.Component {
 
             firebase.database().ref(MESSAGE_URL + CID).on('child_added', (snapshot) => {
                 if (snapshot.exists()) {
-                    console.log("Added");
                     let key = Object.keys(snapshot.toJSON())[0];
                     //alert(key);
                     if (parseInt(snapshot.toJSON()[key]["DateTime"]) > one_week_ago.getTime()) {
