@@ -13,6 +13,14 @@ const HomeStack = createStackNavigator({
             title : 'Home'
         }
     }
+});
+const MapStack = createStackNavigator({
+    Map : {
+        screen : MapScreen,
+        navigationOptions : {
+            title : 'Map'
+        }
+    }
 })
 
 const MainDrawerNavigator = createDrawerNavigator({
@@ -20,7 +28,7 @@ const MainDrawerNavigator = createDrawerNavigator({
         screen: HomeStack
     },
     Map : {
-        screen : MapScreen
+        screen : MapStack
     }
 },
     {
