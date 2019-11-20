@@ -13,92 +13,131 @@ export default class MapScreen extends React.Component {
         self_longitude: -122.4324,
         d_latitude: 0.00,
         d_longitude: 0.00,
-        marker : []
+        marker: [],
+        region: {
+            latitude: 37.78825,
+            longitude: -122.4324,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+        },
+        display_map: false,
+        listening: false
     }
     componentDidMount() {
-        const state = store.getState();
-        this.GetInitialLocation(state.users.accountId);
+        this.getCurrentLocation();
+        //this.GetInitialLocation(state.users.accountId);
         Geolocation.setRNConfiguration({
             skipPermissionRequests: false,
             authorizationLevel: 'always'
         });
+        this.getCurrentLocation();
+
         this.StartListenLocation();
+
     }
-    GetInitialLocation = (currentUserID) => {
-        firebase.database().ref(LOCATION_URL).once('value', (snapshot) => {
-            let keys = Object.keys(snapshot.toJSON());
-            keys.map((key) => {
-                // if(key === currentUserID){
-                //     this.setState({self_latitude : snapshot.toJSON()[key]["location"]["latitude"]})
-                //     this.setState({self_longitude : snapshot.toJSON()[key]["location"]["longititude"]})
-                // }else{
-                //     this.setState({d_latitude : snapshot.toJSON()[key]["location"]["latitude"]})
-                //     this.setState({d_longitude : snapshot.toJSON()[key]["location"]["longititude"]})
-                // }
-            })
-        })
+    getCurrentLocation = () => {
+        Geolocation.getCurrentPosition((position) => {
+            let new_region = {
+                longitudeDelta: 0.0922,
+                latitudeDelta: 0.0922,
+                longitude: position.coords.longitude,
+                latitude: position.coords.latitude
+            }
+            this.setState({ region: new_region });
+            this.setState({ display_map: true });
+        });
     }
     StartListenLocation() {
         firebase.database().ref(LOCATION_URL).on('child_changed', (snapshot) => {
             if (snapshot.exists()) {
-                console.log(JSON.stringify(snapshot.toJSON()));
-                this.state.marker.map((individual_marker)=>{
-                    if(individual_marker.UID === snapshot.toJSON()["location"]["UID"]){
-                        individual_marker.latitude = snapshot.toJSON()["location"]["latitude"];
-                        individual_marker.longitude = snapshot.toJSON()["location"]["longitude"];
-                        this.setState({marker : this.state.marker});
-                    }else{
-
-                        this.state.marker.push({
-                            latitude : snapshot.toJSON()["location"]["latitude"],
-                            longitude : snapshot.toJSON()["location"]["longitude"],
-                            UID : snapshot.toJSON()["location"]["UID"]
-                        });
-                        this.setState({marker : this.state.marker});
-                    }
-                })
+                let unknown_marker = {
+                    latitude: snapshot.toJSON()["location"]["latitude"],
+                    longitude: snapshot.toJSON()["location"]["longitude"],
+                    UID: snapshot.toJSON()["location"]["UID"]
+                }
+                let index = this.state.marker.findIndex((x) => x.UID === unknown_marker.UID);
+                if (index < 0) {
+                    this.state.marker.push(unknown_marker);
+                    this.setState({ marker: this.state.marker });
+                } else {
+                    this.state.marker[index] = unknown_marker;
+                    this.setState({ marker: this.state.marker });
+                }
+                console.log("Done set marker ...");
             }
         })
     }
 
-    SendLocation = () => {
-        console.log("Sended");
-        const state = store.getState();
-        Geolocation.watchPosition((position) => {
-            let location = {
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-                UID: state.users.accountId
-            }
-            firebase.database().ref(LOCATION_URL + state.users.accountId).set({
-                location: location
-            }).catch((err) => {
-                console.log("Send Message Error : " + err);
+    CallergetCurrentLocation = () => {
+        return new Promise((resolve, reject) => {
+            Geolocation.getCurrentPosition((position) => {
+                let new_region = {
+                    longitudeDelta: 0.0922,
+                    latitudeDelta: 0.0922,
+                    longitude: position.coords.longitude,
+                    latitude: position.coords.latitude
+                }
+                resolve(new_region);
             });
-        }, (err) => {
-            console.log("Error : " + err.message);
-        }, { enableHighAccuracy: true });
+        });
+
+    }
+
+    UploadLocation = (region) => {
+        const state = store.getState();
+        let location = {
+            latitude: region.latitude,
+            longitude: region.longitude,
+            UID: state.users.accountId
+        }
+        firebase.database().ref(LOCATION_URL + state.users.accountId).set({
+            location: location
+        }).then(()=>{
+            console.log("Done Upload To firebase");
+        })
+        .catch((err) => {
+            console.log("Send Message Error : " + err);
+        });
+    }
+
+    SendLocation = () => {
+        if (this.state.listening) {
+            clearInterval(sender);
+        } else {
+            sender = setInterval(() => {
+                this.CallergetCurrentLocation().then((result)=>{
+                    this.UploadLocation(result);
+                })
+            }, 15000);
+        }
+        this.setState({ listening: !this.state.listening });
     }
 
 
     render() {
         return (
             <View style={styles.container}>
-                <MapView
-                    style={styles.MapViewContainer}
-                    initialRegion={{
-                        latitude: 45.26,
-                        longitude: -122.08,
-                        latitudeDelta: 0.0922,
-                        longitudeDelta: 0.0421,
-                    }}
-                >
-                    {
-                        this.state.marker.map((mark)=>
-                        <Marker coordinate={{latitude: mark.latitude , longitude : mark.longitude}} title={mark.UID}/>
-                        )
-                    }
-                </MapView>
+                {this.state.display_map ?
+                    <MapView
+                        style={styles.MapViewContainer}
+                        initialRegion={this.state.region}
+                        region={this.state.region}
+                    >
+                        {
+                            this.state.marker.map((mark) =>
+                                <Marker
+                                    key={mark.UID}
+                                    coordinate={{ latitude: mark.latitude, longitude: mark.longitude, latitudeDelta: 0.003, longitudeDelta: 0.003 }}
+                                    title={mark.UID}
+                                />
+                            )
+                        }
+                    </MapView>
+                    :
+                    <View style={styles.MapViewContainer}>
+                    </View>
+                }
+
                 <TouchableOpacity style={styles.ButtonViewContainer} onPress={this.SendLocation}>
                     <Text style={{ height: '100%', width: '100%', textAlign: 'center' }}>Start Listen</Text>
                 </TouchableOpacity>

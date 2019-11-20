@@ -4,7 +4,9 @@ import React, { Component } from 'react';
 import { NavigationActions } from 'react-navigation';
 import { ScrollView, Text, View, TouchableOpacity, AsyncStorage, StyleSheet } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
-
+import firebase from 'react-native-firebase';
+import store from '../redux/store';
+import * as UserAction from '../redux/action/user';
 class SideMenu extends Component {
     state = {
         username: '',
@@ -17,7 +19,14 @@ class SideMenu extends Component {
     }
     componentDidMount() {
     }
-
+    Logout=()=>{
+        firebase.auth().signOut().then((res)=>{
+            store.dispatch(UserAction.Logout());
+            this.navigateToScreen("Login");
+        }).catch((err)=>{
+            console.log("Logout Error : " + err);
+        });
+    }
     render() {
         return (
             <SafeAreaView>
@@ -32,6 +41,9 @@ class SideMenu extends Component {
                             </TouchableOpacity>
                             <TouchableOpacity onPress={()=>{this.navigateToScreen('Map')}}>
                                 <Text>Map</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={()=>{this.Logout()}}>
+                                <Text>Logout</Text>
                             </TouchableOpacity>
                         </View>
                     </ScrollView>
