@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
+import { EventRegister } from 'react-native-event-listeners';
 
 class Card extends React.Component {
     render() {
@@ -16,7 +17,15 @@ export default class GalleryScreen extends React.Component {
     state = {
         cards: ["hello", "Here", "Is", "Sample"]
     }
-
+    componentDidMount=()=>{
+        EventRegister.addEventListener("AddNewImage" , ()=>{
+            //At here initialize the new image upload to firebase 
+            console.log("Add New Image");
+        })
+    }
+    componentWillUnmount=()=>{
+        EventRegister.removeEventListener("AddNewImage");
+    }
     GoToPrevious = () => {
         this.swiper.swipeBack();
     }
@@ -42,6 +51,11 @@ export default class GalleryScreen extends React.Component {
                         onSwipedLeft={()=>{this.GoToPrevious}}
                         goBackToPreviousCardOnSwipeRight={true}
                         stackSize={3}
+                        backgroundColor={"#eb4034"}
+                        childrenOnTop={true}
+                        infinite={true}
+                        cardHorizontalMargin={10}
+                        cardVerticalMargin={10}
                     >   
                     </Swiper>
                 </View>
