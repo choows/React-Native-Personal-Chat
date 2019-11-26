@@ -6,6 +6,7 @@ import HomeScreen from '../screens/HomeScreen';
 import { createDrawerNavigator } from "react-navigation-drawer";
 import SideMenu from './DrawerNavigation';
 import MapScreen from '../screens/MapScreen';
+import GalleryScreen from '../screens/GalleryScreen';
 const HomeStack = createStackNavigator({
     Home : {
         screen : HomeScreen,
@@ -23,12 +24,23 @@ const MapStack = createStackNavigator({
     }
 })
 
+const GalleryStack = createStackNavigator({
+    Gallery : {
+        screen : GalleryScreen,
+        navigationOptions : {
+            title : 'Gallery'
+        }
+    }
+})
 const MainDrawerNavigator = createDrawerNavigator({
     Home: {
         screen: HomeStack
     },
     Map : {
         screen : MapStack
+    },
+    Gallery : {
+        screen : GalleryStack
     }
 },
     {
