@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform, PermissionsAndroid } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform, PermissionsAndroid, Image } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { EventRegister } from 'react-native-event-listeners';
 import firebase from 'react-native-firebase';
@@ -9,7 +9,7 @@ class Card extends React.Component {
     render() {
         return (
             <View style={styles.CardView}>
-                <Text>{this.props.text}</Text>
+                <Image source={{uri : this.props.path}} style={styles.Image}/>
             </View>
         )
     }
@@ -17,11 +17,10 @@ class Card extends React.Component {
 //https://github.com/alexbrillant/react-native-deck-swiper/blob/master/Example/App.js
 export default class GalleryScreen extends React.Component {
     state = {
-        cards: ["hello", "Here", "Is", "Sample"]
+        cards:[]
     }
     componentDidMount = () => {
         EventRegister.addEventListener("AddNewImage", () => {
-
             //At here initialize the new image upload to firebase 
             ImagePicker.showImagePicker({
                 title: 'Photo',
@@ -31,14 +30,26 @@ export default class GalleryScreen extends React.Component {
                 mediaType: 'photo',
                 quality: 1,
             }, (response) => {
-                // console.log("Uri : " +response.uri);
-                // console.log("path : "+response.path);
-                // console.log("Type : " + response.type);
-                // console.log("File Name" + response.fileName);
-                // console.log("TimeStamp : " + response.timestamp);
                 this.UploadToFirebaseStorage(response.path);
             })
         })
+
+
+        /**
+         * initial read from firebase
+         */
+        firebase.database().ref(IMAGE_URL).orderByKey().once('value' , (snapshot)=>{
+            const result= snapshot.toJSON();
+            let keys = Object.keys(snapshot.toJSON());
+            keys.map((key)=>{
+                this.state.cards.push({
+                    Date : key ,
+                    path : result[key]["path"]
+                });
+            });
+            this.setState({cards : this.state.cards});
+        })
+
     }
     componentWillUnmount = () => {
         EventRegister.removeEventListener("AddNewImage");
@@ -47,7 +58,6 @@ export default class GalleryScreen extends React.Component {
         const currentDate =  new Date().getTime();
         let storage_path = currentDate.toString();
         firebase.storage().ref(storage_path).putFile(path).then((response)=>{
-            //console.log("Download Url : " + response.downloadURL);
             this.UploadToFirebaseDatabase(response.downloadURL);
         }).catch((err)=>{
             console.log("Upload Error : " + err);
@@ -73,6 +83,7 @@ export default class GalleryScreen extends React.Component {
         return (
             <View style={styles.Container}>
                 <View style={styles.SwpView}>
+                    {this.state.cards.length >0 ? 
                     <Swiper
                         ref={swiper => {
                             this.swiper = swiper
@@ -80,7 +91,7 @@ export default class GalleryScreen extends React.Component {
                         cards={this.state.cards}
                         renderCard={(card) => {
                             return (
-                                <Card text={card} />
+                                <Card path={card.path} UploadDate={card.Date} key={card.Date}/>
                             )
                         }}
                         cardIndex={0}
@@ -89,11 +100,14 @@ export default class GalleryScreen extends React.Component {
                         stackSize={3}
                         backgroundColor={"#2e3659"}
                         childrenOnTop={true}
-                        infinite={true}
+                        //infinite={true}
                         cardHorizontalMargin={10}
                         cardVerticalMargin={10}
                     >
                     </Swiper>
+                    :
+                    <View></View>
+    }
                 </View>
                 {
                     /**
@@ -122,7 +136,10 @@ const styles = StyleSheet.create({
     },
     SwpView: {
         height: '100%',
-        width: '100%'
+        width: '100%',
+        alignItems : 'center',
+        flex : 1,
+        alignContent : 'center'
     },
     NavigationView: {
         height: '5%',
@@ -135,7 +152,12 @@ const styles = StyleSheet.create({
     },
     CardView: {
         backgroundColor: 'white',
+        height: '80%',
+        width: '80%'
+    },
+    Image : {
         height: '100%',
-        width: '100%'
+        width : '100%',
+        resizeMode : 'contain'
     }
 })
