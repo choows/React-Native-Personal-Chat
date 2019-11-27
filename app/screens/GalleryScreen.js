@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { EventRegister } from 'react-native-event-listeners';
+import firebase from 'react-native-firebase';
 
 class Card extends React.Component {
     render() {
@@ -21,6 +22,7 @@ export default class GalleryScreen extends React.Component {
         EventRegister.addEventListener("AddNewImage" , ()=>{
             //At here initialize the new image upload to firebase 
             console.log("Add New Image");
+            
         })
     }
     componentWillUnmount=()=>{

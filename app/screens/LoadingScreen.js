@@ -11,7 +11,14 @@ export default class HomeScreen extends Component{
         if(user !== null){            
             store.dispatch(userAction.Setup(user.uid , user.displayName));
             GetUserCID(user.uid);
-            this.props.navigation.navigate('Home');
+            const checker= setInterval(()=>{
+                const state = store.getState();
+                if(state.users.accountId !== ''){
+                    clearInterval(checker);
+                    this.props.navigation.navigate('Home');
+
+                }
+            } , 2000)
         }else{
             this.props.navigation.navigate('Login');
         }

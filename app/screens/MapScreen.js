@@ -9,7 +9,7 @@ import { EventRegister } from 'react-native-event-listeners';
 
 export default class MapScreen extends React.Component {
     state = {
-        GeoWatchID : null,
+        GeoWatchID: null,
         self_latitude: 37.78825,
         self_longitude: -122.4324,
         d_latitude: 0.00,
@@ -59,6 +59,7 @@ export default class MapScreen extends React.Component {
         });
     }
     StartListenLocation() {
+        const state = store.getState();
         firebase.database().ref(LOCATION_URL).on('child_changed', (snapshot) => {
             if (snapshot.exists()) {
                 let unknown_marker = {
@@ -74,7 +75,16 @@ export default class MapScreen extends React.Component {
                     this.state.marker[index] = unknown_marker;
                     this.setState({ marker: this.state.marker });
                 }
-                //this.focusOnMarkers();
+                if(state.users.accountId === unknown_marker["UID"]){
+                    let new_region = {
+                        latitude: unknown_marker.latitude,
+                        longitude: unknown_marker.longitude,
+                        latitudeDelta: 0.0922,
+                        longitudeDelta: 0.0421,
+                    }
+                    this.setState({region : new_region});
+                }
+                this.focusOnMarkers();
                 console.log("Done set marker ...");
             }
         })
@@ -116,9 +126,9 @@ export default class MapScreen extends React.Component {
     SendLocation = () => {
         if (this.state.listening) {
             //clearInterval(sender);
-            this.state.GeoWatchID !== null ?Geolocation.clearWatch(this.state.GeoWatchID): null;
+            this.state.GeoWatchID !== null ? Geolocation.clearWatch(this.state.GeoWatchID) : null;
         } else {
-           let watchID = Geolocation.watchPosition((position) => {
+            let watchID = Geolocation.watchPosition((position) => {
                 let region = {
                     longitudeDelta: 0.0922,
                     latitudeDelta: 0.0922,
@@ -126,23 +136,23 @@ export default class MapScreen extends React.Component {
                     latitude: position.coords.latitude
                 }
                 this.UploadLocation(region);
-            } , (err)=>{
+            }, (err) => {
                 console.log("Watch Location Error : " + err.message);
-            } , {enableHighAccuracy : true , maximumAge : 0});
-            this.setState({GeoWatchID : watchID});
+            }, { enableHighAccuracy: true, maximumAge: 0 });
+            this.setState({ GeoWatchID: watchID });
         }
         this.setState({ listening: !this.state.listening });
 
     }
-    focusOnMarkers=()=>{
+    focusOnMarkers = () => {
         let markerID = [];
-        this.state.marker.map((mark)=>{
-            markerID.push(mark.UID);
+        this.state.marker.map((mark) => {
+            markerID.push({
+                latitude: mark.latitude,
+                longitude: mark.longitude
+            });
         });
-        this.MapView.fitToSuppliedMarkers(
-            markerID,
-            true,
-          );
+        this.MapView.fitToCoordinates(markerID, { animated: true })
     }
 
     render() {
@@ -150,7 +160,7 @@ export default class MapScreen extends React.Component {
             <View style={styles.container}>
                 {this.state.display_map ?
                     <MapView
-                    
+
                         style={styles.MapViewContainer}
                         initialRegion={this.state.region}
                         region={this.state.region}

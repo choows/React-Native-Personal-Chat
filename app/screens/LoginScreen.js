@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text , TextInput, TouchableOpacity } from 'react-native'
 import firebase from 'react-native-firebase';
+import store from '../redux/store';
+import * as userAction from '../redux/action/user';
 
 export default class HomeScreen extends React.Component {
 
@@ -12,8 +14,16 @@ export default class HomeScreen extends React.Component {
       
         firebase.auth().signInWithEmailAndPassword(this.state.username , this.state.password).then((result)=>{
             console.log("Successfully signed in ...");
-            //console.log(JSON.stringify(result.user));
-            this.props.navigation.navigate('Home');
+            store.dispatch(userAction.Setup(result.user.uid , result.user.displayName));
+            const checker = setInterval(()=>{
+                const state = store.getState();
+                if(state.users.accountId !== ""){
+                    clearInterval(checker);
+                    this.props.navigation.navigate('Home');
+                }
+
+            }, 2000);
+            
         }).catch((err)=>{
             console.log("Firebase Sign In Error : " + err);
             alert("Login Error : Please reenter the correct username and password");
