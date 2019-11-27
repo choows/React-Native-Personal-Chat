@@ -18,7 +18,7 @@ export default class HomeScreen extends Component{
                     this.props.navigation.navigate('Home');
 
                 }
-            } , 2000)
+            } , 1000)
         }else{
             this.props.navigation.navigate('Login');
         }
