@@ -31,13 +31,9 @@ const MapStack = createStackNavigator({
 const MemoStack = createStackNavigator({
     Memo : {
         screen : MemoScreen,
-        navigationOptions: ({ navigation }) => ({
-            headerForceInset: Platform.OS === "ios" ? {
-                top: 'never',
-                bottom: 'never'
-            } : {},
-            headerTitle:<MemoHeader navigate={navigation}/>
-        })
+        navigationOptions : {
+            title : 'Memo'
+        }
     }
 })
 const GalleryStack = createStackNavigator({
