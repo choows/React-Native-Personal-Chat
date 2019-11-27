@@ -10,6 +10,8 @@ import SideMenu from './DrawerNavigation';
 import MapScreen from '../screens/MapScreen';
 import GalleryScreen from '../screens/GalleryScreen';
 import GalleryHeader from './GalleryHeader';
+import MemoScreen from '../screens/MemoScreen';
+import MemoHeader from './MemoHeader';
 const HomeStack = createStackNavigator({
     Home : {
         screen : HomeScreen,
@@ -26,7 +28,18 @@ const MapStack = createStackNavigator({
         }
     }
 })
-
+const MemoStack = createStackNavigator({
+    Memo : {
+        screen : MemoScreen,
+        navigationOptions: ({ navigation }) => ({
+            headerForceInset: Platform.OS === "ios" ? {
+                top: 'never',
+                bottom: 'never'
+            } : {},
+            headerTitle:<MemoHeader navigate={navigation}/>
+        })
+    }
+})
 const GalleryStack = createStackNavigator({
     Gallery : {
         screen : GalleryScreen,
@@ -48,6 +61,9 @@ const MainDrawerNavigator = createDrawerNavigator({
     },
     Gallery : {
         screen : GalleryStack
+    },
+    Memo : {
+        screen : MemoStack
     }
 },
     {

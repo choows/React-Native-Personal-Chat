@@ -45,6 +45,9 @@ class SideMenu extends Component {
                             <TouchableOpacity onPress={()=>{this.navigateToScreen('Gallery')}}>
                                 <Text>Gallery</Text>
                             </TouchableOpacity>
+                            <TouchableOpacity onPress={()=>{this.navigateToScreen('Memo')}}>
+                                <Text>Memo</Text>
+                            </TouchableOpacity>
                             <TouchableOpacity onPress={()=>{this.Logout()}}>
                                 <Text>Logout</Text>
                             </TouchableOpacity>
