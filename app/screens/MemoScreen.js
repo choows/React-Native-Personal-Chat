@@ -2,35 +2,62 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 export default class MemoScreen extends React.Component {
-
+/**
+ * differentiate the important using dot color ,
+ * database design as below : 
+ * 
+ * Memo -> All -> YearMonth(201911)->store all the dates with important color 
+ * 
+ * Memo -> Details -> YearMonthDay -> store all the memo and display at bottom 
+ */
     state={
         currentDate : '2019-12-01',
-        maxDate : '2020-12-01'
+        maxDate : '2020-12-01',
+        markedDates : {},
+        visible : false
     }
 
     onMonthChange=(month)=>{
         console.log('month changed', month)
     }
 
+    onDayPressed=(day)=>{
+        console.log("Day Selected : " + day["dateString"]);
+        //this.state.markedDates[day["dateString"]] = {dotColor: 'red' , marked: true};
+        let marked = {};
+        marked[day["dateString"]] = {selected : 'true'}
+        this.setState({markedDates : marked});
+        this.setState({visible : false},()=>{
+            this.setState({visible : true});
+
+        });
+    }
     componentDidMount=()=>{
         const currentDate = new Date();
+        currentDate.setMonth(currentDate.getMonth() +1);
         const currentDateString  = currentDate.getFullYear() + "-" + currentDate.getMonth() + "-" + currentDate.getDate();
-        console.log(currentDateString);
+        const nxtyear = new Date();
+        nxtyear.setMonth(nxtyear.getMonth() +1);
+        nxtyear.setDate(nxtyear.getDate() + 365);
+        const nextYearDateString = nxtyear.getFullYear() + "-" +nxtyear.getMonth()+ "-" + nxtyear.getDate();
         this.setState({currentDate : currentDateString});
+        this.setState({maxDate : nextYearDateString});
+        this.setState({visible : true});
     }   
 
     render() {
         return (
             <View>
+                {this.state.visible ?                 
                 <Calendar
                     // Initially visible month. Default = Date()
                     current={this.state.currentDate}
                     // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
-                    minDate={'2012-05-10'}
+                    minDate={this.state.currentDate}
                     // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
-                    maxDate={'2012-05-30'}
+                    maxDate={this.state.maxDate}
                     // Handler which gets executed on day press. Default = undefined
-                    onDayPress={(day) => { console.log('selected day', day) }}
+                    onDayPress={this.onDayPressed}
                     // Handler which gets executed on day long press. Default = undefined
                     onDayLongPress={(day) => { console.log('selected day', day) }}
                     // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
@@ -52,7 +79,13 @@ export default class MemoScreen extends React.Component {
                     onPressArrowLeft={substractMonth => substractMonth()}
                     // Handler which gets executed when press arrow icon left. It receive a callback can go next month
                     onPressArrowRight={addMonth => addMonth()}
+                    markedDates={this.state.markedDates}
+                    markingType={'dot'}
+                    ref={calender => {
+                        this.calender = calender
+                    }}
                 />
+                :<View></View>}
                 <Text>Helo</Text>
             </View>
         )
