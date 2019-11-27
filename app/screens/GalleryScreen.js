@@ -4,12 +4,12 @@ import Swiper from 'react-native-deck-swiper';
 import { EventRegister } from 'react-native-event-listeners';
 import firebase from 'react-native-firebase';
 import ImagePicker from 'react-native-image-picker';
-import {IMAGE_URL} from '../constants/url';
+import { IMAGE_URL } from '../constants/url';
 class Card extends React.Component {
     render() {
         return (
             <View style={styles.CardView}>
-                <Image source={{uri : this.props.path}} style={styles.Image}/>
+                <Image source={{ uri: this.props.path }} style={styles.Image} />
             </View>
         )
     }
@@ -17,7 +17,7 @@ class Card extends React.Component {
 //https://github.com/alexbrillant/react-native-deck-swiper/blob/master/Example/App.js
 export default class GalleryScreen extends React.Component {
     state = {
-        cards:[]
+        cards: []
     }
     componentDidMount = () => {
         EventRegister.addEventListener("AddNewImage", () => {
@@ -30,7 +30,9 @@ export default class GalleryScreen extends React.Component {
                 mediaType: 'photo',
                 quality: 1,
             }, (response) => {
-                this.UploadToFirebaseStorage(response.path);
+                if (!response.didCancel) {
+                    this.UploadToFirebaseStorage(response.path);
+                }
             })
         })
 
@@ -38,37 +40,69 @@ export default class GalleryScreen extends React.Component {
         /**
          * initial read from firebase
          */
-        firebase.database().ref(IMAGE_URL).orderByKey().once('value' , (snapshot)=>{
-            const result= snapshot.toJSON();
-            let keys = Object.keys(snapshot.toJSON());
-            keys.map((key)=>{
-                this.state.cards.push({
-                    Date : key ,
-                    path : result[key]["path"]
+        // firebase.database().ref(IMAGE_URL).orderByKey().once('value', (snapshot) => {
+        //     const result = snapshot.toJSON();
+        //     let keys = Object.keys(snapshot.toJSON());
+        //     keys.map((key) => {
+        //         this.state.cards.push({
+        //             Date: key,
+        //             path: result[key]["path"]
+        //         });
+        //     });
+        //     this.setState({ cards: this.state.cards });
+        // });
+        // this.ListenToChanges();
+        firebase.database().ref(IMAGE_URL).orderByKey().on('child_added', (snapshot) => {
+            let result = snapshot.toJSON();
+            const index = this.state.cards.indexOf(x => x.Date === result["DateTime"]);
+            if (index === -1) {
+                this.state.cards.unshift({
+                    Date: result["DateTime"],
+                    path: result["path"]
                 });
-            });
-            this.setState({cards : this.state.cards});
-        })
+                this.setState({ cards: this.state.cards });
+            }
+        });
 
     }
+
+
+
+    ListenToChanges = () => {
+        firebase.database().ref(IMAGE_URL).orderByKey().on('child_added', (snapshot) => {
+            let result = snapshot.toJSON();
+            const index = this.state.cards.indexOf(x => x.Date === result["DateTime"]);
+            if (index === -1) {
+                this.state.cards.unshift({
+                    Date: result["DateTime"],
+                    path: result["path"]
+                });
+                this.setState({ cards: this.state.cards });
+            }
+
+            //console.log("Result : " + JSON.stringify(snapshot.toJSON()));
+        });
+    }
+
     componentWillUnmount = () => {
         EventRegister.removeEventListener("AddNewImage");
     }
-    UploadToFirebaseStorage=(path)=>{
-        const currentDate =  new Date().getTime();
+    UploadToFirebaseStorage = (path) => {
+        const currentDate = new Date().getTime();
         let storage_path = currentDate.toString();
-        firebase.storage().ref(storage_path).putFile(path).then((response)=>{
+        firebase.storage().ref(storage_path).putFile(path).then((response) => {
             this.UploadToFirebaseDatabase(response.downloadURL);
-        }).catch((err)=>{
+        }).catch((err) => {
             console.log("Upload Error : " + err);
         });
     }
 
-    UploadToFirebaseDatabase=(path)=>{
-        const currentDate =  new Date().getTime().toString();
+    UploadToFirebaseDatabase = (path) => {
+        const currentDate = new Date().getTime().toString();
         firebase.database().ref(IMAGE_URL + "/" + currentDate).set({
-            path : path
-        }).catch((err)=>{
+            path: path,
+            DateTime: currentDate
+        }).catch((err) => {
             console.log("Upload to Database Error : " + err);
         });
     }
@@ -78,36 +112,42 @@ export default class GalleryScreen extends React.Component {
     GoToNext = () => {
         this.swiper.swipeRight();
     }
-
+    GoToFirst=()=>{
+        this.swiper.jumpToCardIndex(0);
+    }
     render() {
         return (
             <View style={styles.Container}>
                 <View style={styles.SwpView}>
-                    {this.state.cards.length >0 ? 
-                    <Swiper
-                        ref={swiper => {
-                            this.swiper = swiper
-                        }}
-                        cards={this.state.cards}
-                        renderCard={(card) => {
-                            return (
-                                <Card path={card.path} UploadDate={card.Date} key={card.Date}/>
-                            )
-                        }}
-                        cardIndex={0}
-                        onSwipedLeft={() => { this.GoToPrevious }}
-                        goBackToPreviousCardOnSwipeRight={true}
-                        stackSize={3}
-                        backgroundColor={"#2e3659"}
-                        childrenOnTop={true}
-                        //infinite={true}
-                        cardHorizontalMargin={10}
-                        cardVerticalMargin={10}
-                    >
-                    </Swiper>
-                    :
-                    <View></View>
-    }
+                    {this.state.cards.length > 0 ?
+                        <Swiper
+                            ref={swiper => {
+                                this.swiper = swiper
+                            }}
+                            cards={this.state.cards}
+                            renderCard={(card) => {
+                                return (
+                                    <Card path={card.path} UploadDate={card.Date} key={card.Date} />
+                                )
+                            }}
+                            cardIndex={0}
+                            onSwipedLeft={() => { this.GoToPrevious }}
+                            goBackToPreviousCardOnSwipeRight={true}
+                            stackSize={3}
+                            backgroundColor={"#2e3659"}
+                            childrenOnTop={true}
+                            //infinite={true}
+                            cardHorizontalMargin={10}
+                            cardVerticalMargin={10}
+                            
+                        >
+                            <TouchableOpacity onPress={this.GoToFirst}>
+                                <Text>Go To First</Text>
+                            </TouchableOpacity>
+                        </Swiper>
+                        :
+                        <View></View>
+                    }
                 </View>
                 {
                     /**
@@ -137,9 +177,9 @@ const styles = StyleSheet.create({
     SwpView: {
         height: '100%',
         width: '100%',
-        alignItems : 'center',
-        flex : 1,
-        alignContent : 'center'
+        alignItems: 'center',
+        flex: 1,
+        alignContent: 'center'
     },
     NavigationView: {
         height: '5%',
@@ -155,9 +195,9 @@ const styles = StyleSheet.create({
         height: '80%',
         width: '80%'
     },
-    Image : {
+    Image: {
         height: '100%',
-        width : '100%',
-        resizeMode : 'contain'
+        width: '100%',
+        resizeMode: 'contain'
     }
 })
