@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, PermissionsAndroid } from 'react-native'
 import firebase from 'react-native-firebase';
 import MapView, { Marker } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
@@ -9,6 +9,7 @@ import { EventRegister } from 'react-native-event-listeners';
 
 export default class MapScreen extends React.Component {
     state = {
+        GeoWatchID : null,
         self_latitude: 37.78825,
         self_longitude: -122.4324,
         d_latitude: 0.00,
@@ -23,9 +24,19 @@ export default class MapScreen extends React.Component {
         display_map: false,
         listening: false
     }
+    RequestLocationPermission = () => {
+        PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, {
+            'title': 'Location Request',
+            'message': 'Location is required to access the function ... ',
+        }).then((granted) => {
+            console.log('granted', granted);
+            // always returns never_ask_again
+        })
+    }
     componentDidMount() {
-        this.getCurrentLocation();
+        this.RequestLocationPermission();
         //this.GetInitialLocation(state.users.accountId);
+        //Geolocation.requestAuthorization();
         Geolocation.setRNConfiguration({
             skipPermissionRequests: false,
             authorizationLevel: 'always'
@@ -63,6 +74,7 @@ export default class MapScreen extends React.Component {
                     this.state.marker[index] = unknown_marker;
                     this.setState({ marker: this.state.marker });
                 }
+                //this.focusOnMarkers();
                 console.log("Done set marker ...");
             }
         })
@@ -90,38 +102,59 @@ export default class MapScreen extends React.Component {
             longitude: region.longitude,
             UID: state.users.accountId
         }
-        firebase.database().ref(LOCATION_URL + state.users.accountId).set({
+        console.log(location);
+        firebase.database().ref(LOCATION_URL + state.users.accountId).update({
             location: location
-        }).then(()=>{
+        }).then(() => {
             console.log("Done Upload To firebase");
         })
-        .catch((err) => {
-            console.log("Send Message Error : " + err);
-        });
+            .catch((err) => {
+                console.log("Send Message Error : " + err);
+            });
     }
 
     SendLocation = () => {
         if (this.state.listening) {
-            clearInterval(sender);
+            //clearInterval(sender);
+            this.state.GeoWatchID !== null ?Geolocation.clearWatch(this.state.GeoWatchID): null;
         } else {
-            sender = setInterval(() => {
-                this.CallergetCurrentLocation().then((result)=>{
-                    this.UploadLocation(result);
-                })
-            }, 15000);
+           let watchID = Geolocation.watchPosition((position) => {
+                let region = {
+                    longitudeDelta: 0.0922,
+                    latitudeDelta: 0.0922,
+                    longitude: position.coords.longitude,
+                    latitude: position.coords.latitude
+                }
+                this.UploadLocation(region);
+            } , (err)=>{
+                console.log("Watch Location Error : " + err.message);
+            } , {enableHighAccuracy : true , maximumAge : 0});
+            this.setState({GeoWatchID : watchID});
         }
         this.setState({ listening: !this.state.listening });
-    }
 
+    }
+    focusOnMarkers=()=>{
+        let markerID = [];
+        this.state.marker.map((mark)=>{
+            markerID.push(mark.UID);
+        });
+        this.MapView.fitToSuppliedMarkers(
+            markerID,
+            true,
+          );
+    }
 
     render() {
         return (
             <View style={styles.container}>
                 {this.state.display_map ?
                     <MapView
+                    
                         style={styles.MapViewContainer}
                         initialRegion={this.state.region}
                         region={this.state.region}
+                        ref={ref => this.MapView = ref}
                     >
                         {
                             this.state.marker.map((mark) =>
