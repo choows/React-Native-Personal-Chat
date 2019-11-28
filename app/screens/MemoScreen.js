@@ -1,6 +1,20 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Modal, TouchableHighlight } from 'react-native';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
+import { EventRegister } from 'react-native-event-listeners';
+
+class Memo extends React.Component {
+    /*Display as .......    Text : Dot With Color */
+    render() {
+        return (
+            <View>
+                <Text>{this.props.text}</Text>
+            </View>
+        )
+    }
+}
+
+
 export default class MemoScreen extends React.Component {
     /**
      * differentiate the important using dot color ,
@@ -13,8 +27,17 @@ export default class MemoScreen extends React.Component {
     state = {
         currentDate: '2019-12-01',
         maxDate: '2020-12-01',
-        markedDates: {},
-        visible: false
+        markedDates: {
+            '2019-11-28': {
+                periods: [
+                    { startingDay: true, endingDay: true, color: '#5f9ea0' },
+                ]
+            },
+        },
+        visible: false,
+        Memos: [],
+        ModalVisible: false,
+        selectedDate: '2010-12-01'
     }
 
     onMonthChange = (month) => {
@@ -24,12 +47,33 @@ export default class MemoScreen extends React.Component {
     onDayPressed = (day) => {
         console.log("Day Selected : " + day["dateString"]);
         //this.state.markedDates[day["dateString"]] = {dotColor: 'red' , marked: true};
-        let marked = {};
-        marked[day["dateString"]] = { selected: 'true' }
-        this.setState({ markedDates: marked });
-        // this.setState({visible : false},()=>{
-        //     this.setState({visible : true});
-        // });
+        this.setSelectedDay(day["dateString"]);
+    }
+    /**
+     * Done Till Here
+     */
+    setSelectedDay = (daystring) => {
+        //daystring format :  2019-11-29
+        if (this.state.selectedDate !== null) {
+            this.state.markedDates[this.state.selectedDate]["selected"] = false;
+        }
+        if (typeof this.state.markedDates[daystring] === "undefined") {
+            this.state.markedDates[daystring] = {
+                selected: true
+            }
+        } else {
+            this.state.markedDates[daystring]["selected"] = true;
+        }
+        this.setState({ markedDates: this.state.markedDates }, () => {
+            this.setState({ visible: false }, () => {
+                this.setState({ visible: true });
+            });
+            this.setState({ selectedDate: daystring });
+        });
+
+    }
+    setModalVisible = (visible) => {
+        this.setState({ ModalVisible: visible });
     }
     componentDidMount = () => {
         const currentDate = new Date();
@@ -39,14 +83,46 @@ export default class MemoScreen extends React.Component {
         nxtyear.setMonth(nxtyear.getMonth() + 1);
         nxtyear.setDate(nxtyear.getDate() + 365);
         const nextYearDateString = nxtyear.getFullYear() + "-" + nxtyear.getMonth() + "-" + nxtyear.getDate();
-        this.setState({ currentDate: currentDateString });
-        this.setState({ maxDate: nextYearDateString });
-        this.setState({ visible: true });
+        this.setState({ currentDate: currentDateString, maxDate: nextYearDateString,selectedDate: currentDateString }, () => {
+            this.setState({ visible: true });
+        });
+        this.setUpMemoDetail();
+        EventRegister.addEventListener("AddNewMemo" , ()=>{
+            this.setModalVisible(true);
+        })
     }
 
+    setUpMemoDetail=()=>{
+        let sample_memo = {
+            text: "Sample Memo Here",
+            date: "2019-12-12",
+            key: 'asbvvwef'
+        }
+        this.state.Memos.push(sample_memo);
+        this.setState({ Memos: this.state.Memos });
+    }
+    ModalView = () => {
+        return (
+            <Modal
+                animationType="slide"
+                transparent={false}
+                visible={this.state.ModalVisible}
+                onRequestClose={() => {
+                    this.setModalVisible(false);
+                }}>
+                <View>
+                    <Text>{this.state.selectedDate}</Text>
+                    <TouchableHighlight onPress={() => { this.setModalVisible(false) }}>
+                        <Text>Close</Text>
+                    </TouchableHighlight>
+                </View>
+            </Modal>
+        )
+    }
     render() {
         return (
             <View style={styles.container}>
+                {this.ModalView()}
                 <View style={styles.calenderView}>
                     {this.state.visible ?
                         <Calendar
@@ -54,12 +130,8 @@ export default class MemoScreen extends React.Component {
                             current={this.state.currentDate}
                             // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
                             minDate={this.state.currentDate}
-                            // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
-                            maxDate={this.state.maxDate}
                             // Handler which gets executed on day press. Default = undefined
                             onDayPress={this.onDayPressed}
-                            // Handler which gets executed on day long press. Default = undefined
-                            onDayLongPress={(day) => { console.log('selected day', day) }}
                             // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
                             monthFormat={'yyyy MM'}
                             // Handler which gets executed when visible month changes in calendar. Default = undefined
@@ -80,44 +152,17 @@ export default class MemoScreen extends React.Component {
                             // Handler which gets executed when press arrow icon left. It receive a callback can go next month
                             onPressArrowRight={addMonth => addMonth()}
                             markedDates={this.state.markedDates}
-                            markingType={'dot'}
-                            ref={calender => {
-                                this.calender = calender
-                            }}
+                            markingType={'multi-period'}
                         />
                         : <View></View>}
                 </View>
 
                 <View style={styles.detailsView}>
                     <ScrollView>
-                        <Text>Hello1 </Text>
-                        <Text>Hello 2</Text>
-                        <Text>Hello 3</Text>
-                        <Text>Hello 4</Text>
-                        <Text>Hello 5</Text>
-                        <Text>Hello 6</Text>
-                        <Text>Hello 7</Text>
-                        <Text>Hello 8</Text>
-                        <Text>Hello 9</Text>
-                        <Text>Hello 0</Text>
-                        <Text>Hello 1</Text>
-                        <Text>Hello 2</Text>
-                        <Text>Hello 3</Text>
-                        <Text>Hello 4</Text>
-                        <Text>Hello 5</Text>
-                        <Text>Hello 6</Text>
-                        <Text>Hello 7</Text>
-                        <Text>Hello 8</Text>
-                        <Text>Hello 9</Text>
-                        <Text>Hello 0</Text>
-                        <Text>Hello 1</Text>
-                        <Text>Hello 2</Text>
-                        <Text>Hello 3</Text>
-                        <Text>Hello 4</Text>
-                        <Text>Hello 5</Text>
-                        <Text>Hello 6</Text>
-                        <Text>Hello 7</Text>
-                        <Text>Hello 8</Text>
+                        {
+                            this.state.Memos.map((memo) =>
+                                <Memo text={memo.text} key={memo.key} />)
+                        }
                     </ScrollView>
                 </View>
             </View>
@@ -133,11 +178,11 @@ const styles = StyleSheet.create({
         width: '100%'
     },
     calenderView: {
-        height: '55%',
+        height: '60%',
         width: '100%'
     },
     detailsView: {
-        height: '45%',
+        height: '40%',
         width: '100%'
     }
 })
