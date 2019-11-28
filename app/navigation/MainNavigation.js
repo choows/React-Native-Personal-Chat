@@ -12,6 +12,7 @@ import GalleryScreen from '../screens/GalleryScreen';
 import GalleryHeader from './GalleryHeader';
 import MemoScreen from '../screens/MemoScreen';
 import MemoHeader from './MemoHeader';
+import NewMemoScreen from '../screens/NewMemoScreen';
 const HomeStack = createStackNavigator({
     Home : {
         screen : HomeScreen,
@@ -38,6 +39,12 @@ const MemoStack = createStackNavigator({
             } : {},
             headerTitle:<MemoHeader navigate={navigation}/>
         })
+    },
+    NewMemo : {
+        screen : NewMemoScreen,
+        navigationOptions : {
+            title : 'New Memo'
+        }
     }
 })
 const GalleryStack = createStackNavigator({

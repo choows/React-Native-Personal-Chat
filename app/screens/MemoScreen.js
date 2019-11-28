@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, ScrollView, StyleSheet, Modal, TouchableHighlight } from 'react-native';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import { EventRegister } from 'react-native-event-listeners';
+import { NavigationActions } from 'react-navigation';
 
 class Memo extends React.Component {
     /*Display as .......    Text : Dot With Color */
@@ -36,7 +37,6 @@ export default class MemoScreen extends React.Component {
         },
         visible: false,
         Memos: [],
-        ModalVisible: false,
         selectedDate: '2010-12-01'
     }
 
@@ -68,12 +68,9 @@ export default class MemoScreen extends React.Component {
             this.setState({ visible: false }, () => {
                 this.setState({ visible: true });
             });
-            this.setState({ selectedDate: daystring });
+            this.setState({ selectedDate: daystring});
         });
 
-    }
-    setModalVisible = (visible) => {
-        this.setState({ ModalVisible: visible });
     }
     componentDidMount = () => {
         const currentDate = new Date();
@@ -83,16 +80,19 @@ export default class MemoScreen extends React.Component {
         nxtyear.setMonth(nxtyear.getMonth() + 1);
         nxtyear.setDate(nxtyear.getDate() + 365);
         const nextYearDateString = nxtyear.getFullYear() + "-" + nxtyear.getMonth() + "-" + nxtyear.getDate();
-        this.setState({ currentDate: currentDateString, maxDate: nextYearDateString,selectedDate: currentDateString }, () => {
+        this.setState({ currentDate: currentDateString, maxDate: nextYearDateString, selectedDate: currentDateString }, () => {
             this.setState({ visible: true });
         });
         this.setUpMemoDetail();
-        EventRegister.addEventListener("AddNewMemo" , ()=>{
-            this.setModalVisible(true);
+        EventRegister.addEventListener("AddNewMemo", () => {
+            const navigateAction = NavigationActions.navigate({
+                routeName: "NewMemo"
+            });
+            this.props.navigation.dispatch(navigateAction);
         })
     }
 
-    setUpMemoDetail=()=>{
+    setUpMemoDetail = () => {
         let sample_memo = {
             text: "Sample Memo Here",
             date: "2019-12-12",
@@ -101,28 +101,10 @@ export default class MemoScreen extends React.Component {
         this.state.Memos.push(sample_memo);
         this.setState({ Memos: this.state.Memos });
     }
-    ModalView = () => {
-        return (
-            <Modal
-                animationType="slide"
-                transparent={false}
-                visible={this.state.ModalVisible}
-                onRequestClose={() => {
-                    this.setModalVisible(false);
-                }}>
-                <View>
-                    <Text>{this.state.selectedDate}</Text>
-                    <TouchableHighlight onPress={() => { this.setModalVisible(false) }}>
-                        <Text>Close</Text>
-                    </TouchableHighlight>
-                </View>
-            </Modal>
-        )
-    }
+    
     render() {
         return (
             <View style={styles.container}>
-                {this.ModalView()}
                 <View style={styles.calenderView}>
                     {this.state.visible ?
                         <Calendar
