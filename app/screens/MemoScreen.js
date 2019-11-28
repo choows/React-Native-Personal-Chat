@@ -29,12 +29,8 @@ export default class MemoScreen extends React.Component {
         currentDate: '2019-12-01',
         maxDate: '2020-12-01',
         markedDates: {
-            '2019-11-28': {
-                periods: [
-                    { startingDay: true, endingDay: true, color: '#5f9ea0' },
-                ]
+                '2019-11-28': {dots: [{color: 'green'}, {color: 'red'}, {color: 'yellow'}]}
             },
-        },
         visible: false,
         Memos: [],
         selectedDate: '2010-12-01'
@@ -134,7 +130,7 @@ export default class MemoScreen extends React.Component {
                             // Handler which gets executed when press arrow icon left. It receive a callback can go next month
                             onPressArrowRight={addMonth => addMonth()}
                             markedDates={this.state.markedDates}
-                            markingType={'multi-period'}
+                            markingType={'multi-dot'}
                         />
                         : <View></View>}
                 </View>
