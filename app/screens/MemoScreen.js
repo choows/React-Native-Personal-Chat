@@ -33,7 +33,7 @@ export default class MemoScreen extends React.Component {
             },
         visible: false,
         Memos: [],
-        selectedDate: '2010-12-01'
+        selectedDate: null
     }
 
     onMonthChange = (month) => {
@@ -55,7 +55,7 @@ export default class MemoScreen extends React.Component {
         }
         if (typeof this.state.markedDates[daystring] === "undefined") {
             this.state.markedDates[daystring] = {
-                selected: true
+                selected: true 
             }
         } else {
             this.state.markedDates[daystring]["selected"] = true;
@@ -76,7 +76,7 @@ export default class MemoScreen extends React.Component {
         nxtyear.setMonth(nxtyear.getMonth() + 1);
         nxtyear.setDate(nxtyear.getDate() + 365);
         const nextYearDateString = nxtyear.getFullYear() + "-" + nxtyear.getMonth() + "-" + nxtyear.getDate();
-        this.setState({ currentDate: currentDateString, maxDate: nextYearDateString, selectedDate: currentDateString }, () => {
+        this.setState({ currentDate: currentDateString, maxDate: nextYearDateString }, () => {
             this.setState({ visible: true });
         });
         this.setUpMemoDetail();

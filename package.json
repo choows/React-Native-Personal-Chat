@@ -20,6 +20,7 @@
     "react": "16.8.6",
     "react-native": "0.60.5",
     "react-native-calendars": "^1.214.0",
+    "react-native-color-picker": "^0.4.4",
     "react-native-deck-swiper": "^1.6.7",
     "react-native-event-listeners": "^1.0.3",
     "react-native-firebase": "^5.5.6",
