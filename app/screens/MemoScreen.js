@@ -3,7 +3,8 @@ import { View, Text, ScrollView, StyleSheet, Modal, TouchableHighlight } from 'r
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import { EventRegister } from 'react-native-event-listeners';
 import { NavigationActions } from 'react-navigation';
-
+import firebase from 'react-native-firebase';
+import { MEMO_URL } from '../constants/url';
 class Memo extends React.Component {
     /*Display as .......    Text : Dot With Color */
     render() {
@@ -28,9 +29,7 @@ export default class MemoScreen extends React.Component {
     state = {
         currentDate: '2019-12-01',
         maxDate: '2020-12-01',
-        markedDates: {
-                '2019-11-28': {dots: [{color: 'green'}, {color: 'red'}, {color: 'yellow'}]}
-            },
+        markedDates: {},
         visible: false,
         Memos: [],
         selectedDate: null
@@ -55,7 +54,7 @@ export default class MemoScreen extends React.Component {
         }
         if (typeof this.state.markedDates[daystring] === "undefined") {
             this.state.markedDates[daystring] = {
-                selected: true 
+                selected: true
             }
         } else {
             this.state.markedDates[daystring]["selected"] = true;
@@ -64,7 +63,7 @@ export default class MemoScreen extends React.Component {
             this.setState({ visible: false }, () => {
                 this.setState({ visible: true });
             });
-            this.setState({ selectedDate: daystring});
+            this.setState({ selectedDate: daystring });
         });
 
     }
@@ -72,6 +71,7 @@ export default class MemoScreen extends React.Component {
         const currentDate = new Date();
         currentDate.setMonth(currentDate.getMonth() + 1);
         const currentDateString = currentDate.getFullYear() + "-" + currentDate.getMonth() + "-" + currentDate.getDate();
+        this.setUpMonthlyMemo(currentDate.getFullYear().toString() + currentDate.getMonth().toString());
         const nxtyear = new Date();
         nxtyear.setMonth(nxtyear.getMonth() + 1);
         nxtyear.setDate(nxtyear.getDate() + 365);
@@ -97,7 +97,57 @@ export default class MemoScreen extends React.Component {
         this.state.Memos.push(sample_memo);
         this.setState({ Memos: this.state.Memos });
     }
-    
+
+    setUpMonthlyMemo = (yearmonth) => {
+        /*
+        {
+                '2019-11-28': {dots: [{color: 'green'}, {color: 'red'}, {color: 'yellow'}]},
+                '2019-11-29': {dots: [{color: 'green'}, {color: 'red'}, {color: 'yellow'}]}
+        }
+        */
+        firebase.database().ref(MEMO_URL + "Overall/" + yearmonth).on('child_added', (snapshot) => {
+            if (snapshot.exists) {
+                console.log(snapshot.toJSON());
+                const result = snapshot.toJSON();
+                const color_arr = result['color'].split(',');
+                let json_arr = [];
+                color_arr.map((color) => {
+                    if (color !== "") {
+                        json_arr.push({
+                            color: color
+                        });
+                    }
+                })
+                this.state.markedDates[result['YMD']] = {
+                    dots: json_arr
+                };
+                this.setState({ markedDates: this.state.markedDates, visible: false }, () => {
+                    this.setState({ visible: true });
+                });
+            }
+        });
+        firebase.database().ref(MEMO_URL + "Overall/" + yearmonth).on('child_changed', (snapshot) => {
+            if (snapshot.exists) {
+                console.log(snapshot.toJSON());
+                const result = snapshot.toJSON();
+                const color_arr = result['color'].split(',');
+                let json_arr = [];
+                color_arr.map((color) => {
+                    if (color !== "") {
+                        json_arr.push({
+                            color: color
+                        });
+                    }
+                })
+                this.state.markedDates[result['YMD']] = {
+                    dots: json_arr
+                };
+                this.setState({ markedDates: this.state.markedDates, visible: false }, () => {
+                    this.setState({ visible: true });
+                });
+            }
+        })
+    }
     render() {
         return (
             <View style={styles.container}>

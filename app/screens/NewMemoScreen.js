@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, TouchableHighlight, Image, ScrollView, TextInpu
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { MemoColor } from '../constants/ColorCode';
 import { ColorPicker, TriangleColorPicker, fromHsv } from 'react-native-color-picker'
+import firebase from 'react-native-firebase';
+import { MEMO_URL } from '../constants/url';
 class Color extends React.Component {
     render() {
         return (
@@ -23,25 +25,36 @@ class Color extends React.Component {
 export default class NewMemoScreen extends React.Component {
     state = {
         from_date: new Date().getTime(),
-        to_date: new Date().getTime(),
         display_from: false,
-        display_to: false,
         text_detail: '',
         color_picker_visible: false,
-        selected_color: '#ffffff'
+        selected_color: '#ffffff',
+        current_date_setted_color: ''
+    }
+    componentDidMount() {
+        this.GetCurrentDateColor(this.state.from_date);
     }
     setFrom_date = (date) => {
         if (date.type !== "dismissed") {
-            this.setState({ from_date: date.nativeEvent.timestamp, display_from: !this.state.display_from });
-        }
-        this.setState({ display_from: !this.state.display_from });
-    }
-    setTo_date = (date) => {
-        if (date.type !== "dismissed") {
-            this.setState({ to_date: date.nativeEvent.timestamp, display_to: !this.state.display_to });
+            this.setState({ from_date: date.nativeEvent.timestamp, display_from: false });
+            this.GetCurrentDateColor(date.nativeEvent.timestamp);
+        } else {
+            this.setState({ display_from: false });
+
         }
     }
-    OnCancelNewMemo=()=>{
+    GetCurrentDateColor = (datestring) => {
+        this.setState({ current_date_setted_color: "" });
+        const date = new Date(datestring);
+        const yearmonth = date.getFullYear().toString() + (date.getMonth() + 1).toString();
+        const yearmonthday = this.DateDisplay(datestring);
+        firebase.database().ref(MEMO_URL + "Overall/" + yearmonth + "/" + yearmonthday + "/").once('value', (snapshot) => {
+            if (snapshot.exists()) {
+                this.setState({ current_date_setted_color: snapshot.toJSON()["color"] });
+            }
+        })
+    }
+    OnCancelNewMemo = () => {
         this.props.navigation.goBack();
     }
     DateDisplay = (dateString) => {
@@ -54,8 +67,27 @@ export default class NewMemoScreen extends React.Component {
     OnColorLongPress = () => {
         this.setState({ color_picker_visible: true });
     }
-    SubmitNewMemo=()=>{
-        console.log("Submit New Memo");
+    SubmitNewMemo = () => {
+        const date_submit = new Date(this.state.from_date);
+        const yearmonth = date_submit.getFullYear().toString() + (date_submit.getMonth() + 1).toString();
+        const yearmonthday = this.DateDisplay(this.state.from_date);
+        //'2019-11-28': {dots: [{color: 'green'}, {color: 'red'}, {color: 'yellow'}]}
+        const arry_color = this.state.current_date_setted_color.split(',');
+        if (arry_color.includes(this.state.selected_color)) {
+            alert("Color Already In-Used.");
+        } else {
+            arry_color.push(this.state.selected_color);
+            const path = MEMO_URL + "Overall/" + yearmonth + "/" + yearmonthday;
+            firebase.database().ref(path).set({
+                color: arry_color.toString(),
+                YMD : yearmonthday
+            }).then(() => {
+                console.log("Done Upload To firebase");
+                this.OnCancelNewMemo();
+            }).catch((err) => {
+                console.log("Send Message Error : " + err);
+            });
+        }
     }
     render() {
         return (
@@ -74,7 +106,7 @@ export default class NewMemoScreen extends React.Component {
                 </Modal>
                 <View style={styles.SectionView}>
                     <Text>Date : </Text>
-                    <TouchableOpacity onPress={() => { this.setState({ display_from: !this.state.display_from }) }}>
+                    <TouchableOpacity onPress={() => { this.setState({ display_from: true }) }}>
                         <Text>{this.DateDisplay(this.state.from_date)}</Text>
                     </TouchableOpacity>
 
@@ -95,22 +127,24 @@ export default class NewMemoScreen extends React.Component {
                             )
                         }
                     </ScrollView>
-                    <View style={{ backgroundColor: this.state.selected_color, 
-                        borderRadius: 300, 
-                        width: 20, 
+                    <View style={{
+                        backgroundColor: this.state.selected_color,
+                        borderRadius: 300,
+                        width: 20,
                         height: 20,
-                        marginRight: 10, 
-                        borderWidth: 2, 
-                        borderColor: 'black' , 
-                        marginRight : 0}}>
-                    <Text></Text>
+                        marginRight: 10,
+                        borderWidth: 2,
+                        borderColor: 'black',
+                        marginRight: 0
+                    }}>
+                        <Text></Text>
                     </View>
                 </View>
                 <View style={{ flexDirection: 'row' }}>
                     <Text>Detail :   </Text>
                     <TextInput multiline={true} autoCorrect={true} editable={true} value={this.state.text_detail} onChangeText={(text) => { this.setState({ text_detail: text }) }} />
                 </View>
-                <View style={{flexDirection : 'row'}}>
+                <View style={{ flexDirection: 'row' }}>
                     <TouchableOpacity onPress={this.SubmitNewMemo}>
                         <Text>Done</Text>
                     </TouchableOpacity>
