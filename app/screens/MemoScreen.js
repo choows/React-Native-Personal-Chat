@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, Modal, TouchableHighlight } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Modal, TouchableHighlight, TouchableOpacity } from 'react-native';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import { EventRegister } from 'react-native-event-listeners';
 import { NavigationActions } from 'react-navigation';
@@ -7,10 +7,30 @@ import firebase from 'react-native-firebase';
 import { MEMO_URL } from '../constants/url';
 class Memo extends React.Component {
     /*Display as .......    Text : Dot With Color */
+
+
+    navigateToDetails = () => {
+        const path = MEMO_URL + "Detail/" + this.props.date + "/" + this.props.keyword ;
+
+        this.props.navigation.navigate('EditMemo', {
+            path : path,
+            color : this.props.color,
+            text : this.props.text,
+            title : this.props.title,
+            date : this.props.date
+        });
+    }
+
     render() {
         return (
-            <View>
-                <Text>{this.props.text}</Text>
+            <View style={{ width: '100%', height: 40, flexDirection: 'row', alignContent: 'center' }}>
+                <TouchableOpacity onPress={this.navigateToDetails} style={{height : '100%' , width : '100%' , flexDirection : 'row' , alignContent : 'stretch'}}>
+                    <View style={{ backgroundColor: this.props.color, borderRadius: 300, width: 20, height: 20, marginRight: 10, borderWidth: 1, borderColor: 'black' }}>
+                        <Text></Text>
+                    </View>
+                    <Text>{this.props.title}</Text>
+                </TouchableOpacity>
+
             </View>
         )
     }
@@ -36,13 +56,14 @@ export default class MemoScreen extends React.Component {
     }
 
     onMonthChange = (month) => {
-        console.log('month changed', month)
+        //this.setState({markedDates : {}});
+        this.setUpMonthlyMemo(month.year.toString() + month.month.toString());
     }
 
     onDayPressed = (day) => {
-        console.log("Day Selected : " + day["dateString"]);
         //this.state.markedDates[day["dateString"]] = {dotColor: 'red' , marked: true};
         this.setSelectedDay(day["dateString"]);
+        this.setUpMemoDetail(day["dateString"]);
     }
     /**
      * Done Till Here
@@ -79,23 +100,40 @@ export default class MemoScreen extends React.Component {
         this.setState({ currentDate: currentDateString, maxDate: nextYearDateString }, () => {
             this.setState({ visible: true });
         });
-        this.setUpMemoDetail();
         EventRegister.addEventListener("AddNewMemo", () => {
             const navigateAction = NavigationActions.navigate({
                 routeName: "NewMemo"
             });
             this.props.navigation.dispatch(navigateAction);
-        })
+        });
+        EventRegister.addEventListener("RefreshMemoWithDate" , (yearmonthday)=>{
+                this.setUpMemoDetail(yearmonthday);
+        });
     }
 
-    setUpMemoDetail = () => {
-        let sample_memo = {
-            text: "Sample Memo Here",
-            date: "2019-12-12",
-            key: 'asbvvwef'
-        }
-        this.state.Memos.push(sample_memo);
-        this.setState({ Memos: this.state.Memos });
+    setUpMemoDetail = (yearmonthday) => {
+        firebase.database().ref(MEMO_URL + "Detail/" + yearmonthday + "/").once('value', (snapshot) => {
+            if (snapshot.exists) {
+                if (snapshot.toJSON() !== null) {
+                    let new_arr = [];
+                    const result = snapshot.toJSON();
+                    let keys = Object.keys(snapshot.toJSON());
+                    keys.map((key) => {
+                        const details = result[key];
+                        new_arr.push({
+                            text: details["text"],
+                            date: yearmonthday,
+                            key: key,
+                            color: details["color"],
+                            title : details["title"]
+                        });
+                    });
+                    this.setState({ Memos: new_arr });
+                }
+            }
+        })
+        // this.state.Memos.push(sample_memo);
+        // this.setState({ Memos: this.state.Memos });
     }
 
     setUpMonthlyMemo = (yearmonth) => {
@@ -107,7 +145,6 @@ export default class MemoScreen extends React.Component {
         */
         firebase.database().ref(MEMO_URL + "Overall/" + yearmonth).on('child_added', (snapshot) => {
             if (snapshot.exists) {
-                console.log(snapshot.toJSON());
                 const result = snapshot.toJSON();
                 const color_arr = result['color'].split(',');
                 let json_arr = [];
@@ -128,7 +165,6 @@ export default class MemoScreen extends React.Component {
         });
         firebase.database().ref(MEMO_URL + "Overall/" + yearmonth).on('child_changed', (snapshot) => {
             if (snapshot.exists) {
-                console.log(snapshot.toJSON());
                 const result = snapshot.toJSON();
                 const color_arr = result['color'].split(',');
                 let json_arr = [];
@@ -168,7 +204,7 @@ export default class MemoScreen extends React.Component {
                             hideExtraDays={false}
                             // If hideArrows=false and hideExtraDays=false do not switch month when tapping on greyed out
                             // day from another month that is visible in calendar page. Default = false
-                            disableMonthChange={true}
+                            disableMonthChange={false}
                             // If firstDay=1 week starts from Monday. Note that dayNames and dayNamesShort should still start from Sunday.
                             firstDay={1}
                             // Hide day names. Default = false
@@ -189,7 +225,7 @@ export default class MemoScreen extends React.Component {
                     <ScrollView>
                         {
                             this.state.Memos.map((memo) =>
-                                <Memo text={memo.text} key={memo.key} />)
+                                <Memo text={memo.text} title={memo.title} key={memo.key} date={memo.date} color={memo.color} keyword={memo.key} navigation={this.props.navigation}/>)
                         }
                     </ScrollView>
                 </View>

@@ -13,6 +13,8 @@ import GalleryHeader from './GalleryHeader';
 import MemoScreen from '../screens/MemoScreen';
 import MemoHeader from './MemoHeader';
 import NewMemoScreen from '../screens/NewMemoScreen';
+import MemoScreenEdit from '../screens/MemoScreenEdit';
+import SettingScreen from '../screens/SettingScreen';
 const HomeStack = createStackNavigator({
     Home : {
         screen : HomeScreen,
@@ -45,6 +47,12 @@ const MemoStack = createStackNavigator({
         navigationOptions : {
             title : 'New Memo'
         }
+    },
+    EditMemo : {
+        screen : MemoScreenEdit,
+        navigationOptions : {
+            title : 'Edit'
+        }
     }
 })
 const GalleryStack = createStackNavigator({
@@ -58,7 +66,15 @@ const GalleryStack = createStackNavigator({
             headerTitle:<GalleryHeader navigate={navigation}/>
         })
     }
-})
+});
+const SettingStack = createStackNavigator({
+    Setting : {
+        screen : SettingScreen,
+        navigationOptions : {
+            title : 'Setting'
+        }
+    }
+});
 const MainDrawerNavigator = createDrawerNavigator({
     Home: {
         screen: HomeStack
@@ -71,6 +87,9 @@ const MainDrawerNavigator = createDrawerNavigator({
     },
     Memo : {
         screen : MemoStack
+    },
+    Setting : {
+        screen : SettingStack
     }
 },
     {

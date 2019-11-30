@@ -29,7 +29,8 @@ export default class NewMemoScreen extends React.Component {
         text_detail: '',
         color_picker_visible: false,
         selected_color: '#ffffff',
-        current_date_setted_color: ''
+        current_date_setted_color: '',
+        text_title : ''
     }
     componentDidMount() {
         this.GetCurrentDateColor(this.state.from_date);
@@ -80,14 +81,28 @@ export default class NewMemoScreen extends React.Component {
             const path = MEMO_URL + "Overall/" + yearmonth + "/" + yearmonthday;
             firebase.database().ref(path).set({
                 color: arry_color.toString(),
-                YMD : yearmonthday
+                YMD: yearmonthday
             }).then(() => {
-                console.log("Done Upload To firebase");
+                this.SubmitMemoDetail();
                 this.OnCancelNewMemo();
             }).catch((err) => {
                 console.log("Send Message Error : " + err);
             });
         }
+    }
+    SubmitMemoDetail = () => {
+        const date = new Date(this.state.from_date);
+        const yearmonthday = date.getFullYear() + '-' + (date.getMonth()+1).toString() + "-" + date.getDate();
+        const path = MEMO_URL + "Detail/" + yearmonthday + "/";
+            firebase.database().ref(path).push({
+                title : this.state.text_title,
+                text : this.state.text_detail,
+                color : this.state.selected_color
+            }).then((res)=>{
+                console.log("Done Push To Firebase.");
+            }).catch((err)=>{
+                console.log("Push To Firebase Error : " + err);
+            });
     }
     render() {
         return (
@@ -139,6 +154,10 @@ export default class NewMemoScreen extends React.Component {
                     }}>
                         <Text></Text>
                     </View>
+                </View>
+                <View style={{ flexDirection: 'row' }}>
+                    <Text>Title :   </Text>
+                    <TextInput multiline={false} autoCorrect={true} editable={true} value={this.state.text_title} onChangeText={(text) => { this.setState({ text_title: text }) }} />
                 </View>
                 <View style={{ flexDirection: 'row' }}>
                     <Text>Detail :   </Text>
