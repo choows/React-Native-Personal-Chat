@@ -13,8 +13,7 @@ export default class HomeScreen extends React.Component {
     Login=()=>{
       
         firebase.auth().signInWithEmailAndPassword(this.state.username , this.state.password).then((result)=>{
-            console.log("Successfully signed in ...");
-            store.dispatch(userAction.Setup(result.user.uid , result.user.displayName));
+            store.dispatch(userAction.Setup(result.user.uid , result.user.displayName , result.user.email , result.user.photoURL));
             const checker = setInterval(()=>{
                 const state = store.getState();
                 if(state.users.accountId !== ""){

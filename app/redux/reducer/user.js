@@ -1,7 +1,8 @@
 import {
     USER_LOG_OUT,
     USER_SETUP,
-    CONVO_SETUP
+    CONVO_SETUP,
+    USER_IMAGE_SETUP
 }
     from '../action/types'
 
@@ -10,7 +11,9 @@ const initialState =
 {
     accountId: '',
     displayName : '',
-    conversationID : ''
+    conversationID : '',
+    ProfileImage : 'https://firebasestorage.googleapis.com/v0/b/dearapp-debe1.appspot.com/o/profile_Image.png?alt=media&token=540c023f-c81a-40c0-a963-61b468340503',
+    Email : ''
 }
 export default (state = initialState, action) => {
     switch (action.type) {
@@ -18,7 +21,9 @@ export default (state = initialState, action) => {
             return {
                 ... state,
                 accountId : action.AccountId,
-                displayName : action.DisplayName
+                displayName : action.DisplayName,
+                ProfileImage : action.Url,
+                Email : action.Email
             }
         }
         case CONVO_SETUP :{
@@ -31,6 +36,12 @@ export default (state = initialState, action) => {
             {
                 return initialState;
             }
+        case USER_IMAGE_SETUP : {
+            return {
+                ...state,
+                ProfileImage : action.Url
+            }
+        }
         default:
             {
                 return state;

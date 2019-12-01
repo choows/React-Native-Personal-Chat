@@ -9,7 +9,7 @@ export default class HomeScreen extends Component{
     componentDidMount(){
         let user = firebase.auth().currentUser;
         if(user !== null){            
-            store.dispatch(userAction.Setup(user.uid , user.displayName));
+            store.dispatch(userAction.Setup(user.uid , user.displayName , user.email , user.photoURL));
             GetUserCID(user.uid);
             const checker= setInterval(()=>{
                 const state = store.getState();
