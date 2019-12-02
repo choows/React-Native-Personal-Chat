@@ -23,9 +23,14 @@ const HomeStack = createStackNavigator({
         screen: HomeScreen,
         navigationOptions: {
             headerTitle : 'Home',
+            headerStyle : {
+                backgroundColor : dynamic_side_drawer_header_color()
+            },
         }
     }
 });
+
+
 const MapStack = createStackNavigator({
     Map: {
         screen: MapScreen,

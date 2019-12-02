@@ -4,6 +4,7 @@ import firebase from 'react-native-firebase';
 import store from '../redux/store';
 import { MESSAGE_URL } from '../constants/url';
 import { asyncGetUserCID } from '../util/UserSetup';
+import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynamic_main_background_color } from '../theme/DynamicStyles';
 
 class MessageDetail extends React.Component {
     state = {
@@ -18,15 +19,19 @@ class MessageDetail extends React.Component {
         if (this.props.message_detail.message.SendBy === this.state.UserId) {
             //self
             return (
-                <View style={styles.SelfTextContainer}>
-                    <Text>{this.props.message_detail.message.Detail}</Text>
+                <View style={[styles.SelfTextContainer , styles.CommonTextContainer]}>
+                    <View style={styles.SelfTextView}>
+                        <Text style={styles.ChatMessageText}>{this.props.message_detail.message.Detail}</Text>
+                    </View>
                 </View>
             )
         } else {
             //oppo
             return (
-                <View style={styles.OpoTextContainer}>
-                    <Text>{this.props.message_detail.message.Detail}</Text>
+                <View style={[styles.OpoTextContainer , styles.CommonTextContainer]}>
+                    <View style={styles.OpoTextView}>
+                        <Text style={styles.ChatMessageText}>{this.props.message_detail.message.Detail}</Text>
+                    </View>
                 </View>
             )
         }
@@ -143,7 +148,8 @@ export default class HomeScreen extends React.Component {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        height: '100%'
+        height: '100%',
+        backgroundColor : dynamic_main_background_color()
     },
     messageContainer: {
         width: '100%',
@@ -166,12 +172,27 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     SelfTextContainer: {
-        marginRight: '2%',
         flexDirection: 'row-reverse',
-        paddingRight : 5
     },
     OpoTextContainer: {
-        marginLeft: '2%',
-        flexDirection: 'row'
+        flexDirection: 'row',
+    },
+    CommonTextContainer : {
+        width : '100%',
+        backgroundColor : '#ffffff00',
+        alignItems :'center',
+        alignContent : 'center',
+        marginBottom : '1%'
+    },
+    ChatMessageText : {
+        fontSize :17,
+    },
+    OpoTextView : {
+        backgroundColor : '#d15c71',
+        maxWidth : '60%'
+    },
+    SelfTextView : {
+        backgroundColor : '#d15c71',
+        maxWidth : '60%'
     }
 })
