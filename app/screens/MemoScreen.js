@@ -81,9 +81,9 @@ export default class MemoScreen extends React.Component {
             this.state.markedDates[daystring]["selected"] = true;
         }
         this.setState({ markedDates: this.state.markedDates }, () => {
-            this.setState({ visible: false }, () => {
-                this.setState({ visible: true });
-            });
+            // this.setState({ visible: false }, () => {
+            //     this.setState({ visible: true });
+            // });
             this.setState({ selectedDate: daystring });
         });
 
@@ -158,8 +158,8 @@ export default class MemoScreen extends React.Component {
                 this.state.markedDates[result['YMD']] = {
                     dots: json_arr
                 };
-                this.setState({ markedDates: this.state.markedDates, visible: false }, () => {
-                    this.setState({ visible: true });
+                this.setState({ markedDates: this.state.markedDates }, () => {
+                   // this.setState({ visible: true });
                 });
             }
         });
@@ -178,8 +178,8 @@ export default class MemoScreen extends React.Component {
                 this.state.markedDates[result['YMD']] = {
                     dots: json_arr
                 };
-                this.setState({ markedDates: this.state.markedDates, visible: false }, () => {
-                    this.setState({ visible: true });
+                this.setState({ markedDates: this.state.markedDates }, () => {
+                  //  this.setState({ visible: true });
                 });
             }
         })
@@ -191,9 +191,9 @@ export default class MemoScreen extends React.Component {
                     {this.state.visible ?
                         <Calendar
                             // Initially visible month. Default = Date()
-                            current={this.state.currentDate}
+                            //current={this.state.currentDate}
                             // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
-                            minDate={this.state.currentDate}
+                            //minDate={this.state.currentDate}
                             // Handler which gets executed on day press. Default = undefined
                             onDayPress={this.onDayPressed}
                             // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
@@ -215,7 +215,7 @@ export default class MemoScreen extends React.Component {
                             onPressArrowLeft={substractMonth => substractMonth()}
                             // Handler which gets executed when press arrow icon left. It receive a callback can go next month
                             onPressArrowRight={addMonth => addMonth()}
-                            markedDates={this.state.markedDates}
+                            markedDates={JSON.parse(JSON.stringify(this.state.markedDates))}
                             markingType={'multi-dot'}
                         />
                         : <View></View>}
