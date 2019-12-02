@@ -4,6 +4,7 @@ import firebase from 'react-native-firebase';
 import store from '../redux/store';
 import * as userAction from '../redux/action/user';
 import {GetUserCID} from '../util/UserSetup';
+import themeStyles from '../theme/ThemeManager';
 export default class HomeScreen extends Component{
     
     componentDidMount(){
@@ -15,8 +16,8 @@ export default class HomeScreen extends Component{
                 const state = store.getState();
                 if(state.users.accountId !== ''){
                     clearInterval(checker);
+                    themeStyles.setTheme('PinkTheme');
                     this.props.navigation.navigate('Home');
-
                 }
             } , 1000)
         }else{

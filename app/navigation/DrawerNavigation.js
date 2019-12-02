@@ -2,11 +2,13 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { NavigationActions } from 'react-navigation';
-import { ScrollView, Text, View, TouchableOpacity, AsyncStorage, StyleSheet } from 'react-native';
+import { ScrollView, Text, View, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import firebase from 'react-native-firebase';
 import store from '../redux/store';
 import * as UserAction from '../redux/action/user';
+import { Icon } from 'react-native-elements'
+import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynamic_main_background_color } from '../theme/DynamicStyles';
 class SideMenu extends Component {
     state = {
         username: '',
@@ -18,41 +20,89 @@ class SideMenu extends Component {
         this.props.navigation.dispatch(navigateAction);
     }
     componentDidMount() {
+
     }
-    Logout=()=>{
-        firebase.auth().signOut().then((res)=>{
+    Logout = () => {
+        firebase.auth().signOut().then((res) => {
             store.dispatch(UserAction.Logout());
             this.navigateToScreen("Login");
-        }).catch((err)=>{
+        }).catch((err) => {
             console.log("Logout Error : " + err);
         });
     }
     render() {
+        const state = store.getState();
         return (
             <SafeAreaView>
                 <View style={[{ height: '100%', width: '100%' }]}>
                     <ScrollView>
-                        <View>
-                            <Text>UserName</Text>
-                        </View>
-                        <View>
-                            <TouchableOpacity onPress={()=>{this.navigateToScreen('Home')}}>
-                                <Text>Home</Text>
+                        <TouchableOpacity style={[cus_style.Profile_View_Container , {backgroundColor: dynamic_side_drawer_header_color()}]} onPress={() => { this.navigateToScreen('Setting') }}>
+                            <View style={cus_style.ProfileImageViewContainer}>
+                                <Image source={{ uri: state.users.ProfileImage }} style={cus_style.ProfileImage} />
+                            </View>
+                            <Text style={cus_style.DisplayNameStyle}>{state.users.displayName}</Text>
+                            <Text style={cus_style.EmailDisplay}>{state.users.Email}</Text>
+                        </TouchableOpacity>
+                        <View style={{backgroundColor : dynamic_main_background_color()}}>
+                            <TouchableOpacity onPress={() => { this.navigateToScreen('Home') }} style={cus_style.NavigationSelectionView}>
+                                <Icon
+                                    name='home'
+                                    type='ionicons'
+                                    color={dynamic_side_drawer_icon_color()}
+                                    size={cus_style.NavigationItem_Icon.fontSize}
+                                    style={cus_style.NavigationItem_Icon}
+                                />
+                                <Text style={cus_style.NavigationItem_Text}>HOME</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={()=>{this.navigateToScreen('Map')}}>
-                                <Text>Map</Text>
+                            <TouchableOpacity onPress={() => { this.navigateToScreen('Map') }} style={cus_style.NavigationSelectionView}>
+                                <Icon
+                                    name='map'
+                                    type='ionicons'
+                                    color={dynamic_side_drawer_icon_color()}
+                                    size={cus_style.NavigationItem_Icon.fontSize}
+                                    style={cus_style.NavigationItem_Icon}
+                                />
+                                <Text style={cus_style.NavigationItem_Text}>MAP</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={()=>{this.navigateToScreen('Gallery')}}>
-                                <Text>Gallery</Text>
+                            <TouchableOpacity onPress={() => { this.navigateToScreen('Gallery') }} style={cus_style.NavigationSelectionView}>
+                                <Icon
+                                    name='image'
+                                    type='font-awesome'
+                                    color={dynamic_side_drawer_icon_color()}
+                                    size={cus_style.NavigationItem_Icon.fontSize}
+                                    style={cus_style.NavigationItem_Icon}
+                                />
+                                <Text style={cus_style.NavigationItem_Text}>GALLERY</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={()=>{this.navigateToScreen('Memo')}}>
-                                <Text>Memo</Text>
+                            <TouchableOpacity onPress={() => { this.navigateToScreen('Memo') }} style={cus_style.NavigationSelectionView}>
+                                <Icon
+                                    name='today'
+                                    type='material'
+                                    color={dynamic_side_drawer_icon_color()}
+                                    size={cus_style.NavigationItem_Icon.fontSize}
+                                    style={cus_style.NavigationItem_Icon}
+                                />
+                                <Text style={cus_style.NavigationItem_Text}>MEMO</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={()=>{this.navigateToScreen('Setting')}}>
-                                <Text>Setting</Text>
+                            <TouchableOpacity onPress={() => { this.navigateToScreen('Setting') }} style={cus_style.NavigationSelectionView}>
+                                <Icon
+                                    name='settings'
+                                    type='ionicons'
+                                    color={dynamic_side_drawer_icon_color()}
+                                    size={cus_style.NavigationItem_Icon.fontSize}
+                                    style={cus_style.NavigationItem_Icon}
+                                />
+                                <Text style={cus_style.NavigationItem_Text}>SETTING</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={()=>{this.Logout()}}>
-                                <Text>Logout</Text>
+                            <TouchableOpacity onPress={() => { this.Logout() }} style={cus_style.NavigationSelectionView}>
+                                <Icon
+                                    name='sign-out'
+                                    type='font-awesome'
+                                    color={dynamic_side_drawer_icon_color()}
+                                    size={cus_style.NavigationItem_Icon.fontSize}
+                                    style={cus_style.NavigationItem_Icon}
+                                />
+                                <Text style={cus_style.NavigationItem_Text}>LOGOUT</Text>
                             </TouchableOpacity>
                         </View>
                     </ScrollView>
@@ -69,48 +119,46 @@ SideMenu.propTypes = {
 export default SideMenu;
 
 const cus_style = StyleSheet.create({
-    SideMenuText: {
+    Profile_View_Container: {
+        height: 180,
         width: '100%',
-        height: '100%',
-        fontSize: 14,
-        textAlignVertical: 'center',
-        paddingLeft: 15
-    },
-    MainHeaderTextUN: {
-        fontSize: 14,
-        paddingLeft: 15,
-        marginTop: '4%'
-    },
-    MainHeaderTextAM: {
-        fontSize: 14,
-        paddingLeft: 15,
-    },
-    HeaderText: {
-        width: '100%',
-        fontSize: 15,
-        textAlign: 'center',
-        marginTop: '6%'
-
-    },
-    MainHeaderText: {
-        width: '100%',
-        height: '100%',
-        fontSize: 18,
-    },
-    HeaderContainer: {
-        width: '100%',
-        height: 50,
-        textAlignVertical: 'center',
-        textAlign: 'center'
-    },
-    TextContainer: {
-        height: 50,
-        borderWidth: 0.3,
-        flex: 1,
-        textAlign: 'center',
         alignItems: 'center'
     },
-    RefreshIcon: {
-
+    ProfileImageViewContainer: {
+        height: 100,
+        width: '100%',
+        marginTop: '1%',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    ProfileImage: {
+        resizeMode: 'cover',
+        borderRadius: 200,
+        height: 90,
+        width: 90
+    },
+    DisplayNameStyle: {
+        fontSize: 20,
+        fontWeight: 'bold'
+    },
+    EmailDisplay: {
+        fontSize: 15,
+        fontWeight: '100'
+    },
+    NavigationSelectionView: {
+        flexDirection: 'row',
+        height: 50,
+        width: '100%',
+        alignItems : 'center',
+        borderWidth : 0.3
+    },
+    NavigationItem_Text : {
+        fontSize: 15,
+        marginLeft : '10%',
+        textAlign : 'left'
+    },
+    NavigationItem_Icon : {
+        marginLeft : '1%',
+        fontSize : 35
     }
 })

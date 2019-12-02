@@ -1,19 +1,20 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import store from '../redux/store';
 import firebase from 'react-native-firebase';
 import ImagePicker from 'react-native-image-picker';
 
 export default class SettingScreen extends React.Component {
     state = {
-        profile_image: 'https://firebasestorage.googleapis.com/v0/b/dearapp-debe1.appspot.com/o/profile_Image.png?alt=media&token=540c023f-c81a-40c0-a963-61b468340503',
-        display_name: '',
+        profile_image: '',
+        display_name: 'No Display Name',
         email: '',
+        EditProfile: false
     }
     componentDidMount() {
         const state = store.getState();
         state.users.ProfileImage !== '' ? this.setState({ profile_image: state.users.ProfileImage }) : null;
-        state.users.displayName !== "" ? this.setState({ displayName: state.users.displayName }) : null;
+        state.users.displayName !== "" ? this.setState({ display_name: state.users.displayName }) : null;
         state.users.Email !== '' ? this.setState({ email: state.users.Email }) : null;
     }
     ShowImagePicker = () => {
@@ -37,7 +38,15 @@ export default class SettingScreen extends React.Component {
             displayName: this.state.display_name,
         }).then(() => {
             console.log("Done Update Profile");
-        })
+        }).catch((err)=>{
+            console.log("Error : " + err);
+        });
+    }
+    ProfileEdit = () => {
+        if (this.state.EditProfile) {
+            this.UpdateProfile();
+        }
+        this.setState({ EditProfile: !this.state.EditProfile });
     }
     UploadToFirebaseStorage = (path) => {
         const currentDate = new Date().getTime();
@@ -52,13 +61,26 @@ export default class SettingScreen extends React.Component {
         return (
             <View style={styles.container}>
                 <ScrollView style={styles.container}>
+                    <View style={styles.ProfileEditButtonView}>
+                        <TouchableOpacity onPress={this.ProfileEdit}>
+                            <Text>{this.state.EditProfile ? "Done" : "Edit"}</Text>
+                        </TouchableOpacity>
+                    </View>
                     <View style={styles.ImageViewcontainer}>
-                        <TouchableOpacity onPress={this.ShowImagePicker} style={styles.Image}>
+                        <TouchableOpacity onPress={this.state.EditProfile ? this.ShowImagePicker : null} style={styles.Image}>
                             <Image source={{ uri: this.state.profile_image }} style={styles.Image} />
                         </TouchableOpacity>
                     </View>
                     <View style={styles.ProfileNamecontainer}>
-                        <Text>{this.state.display_name}</Text>
+                        {
+                            this.state.EditProfile ?
+                                <TextInput value={this.state.display_name} onChangeText={(text) => { this.setState({ display_name: text }) }} multiline={false} />
+                                :
+                                <Text>{this.state.display_name}</Text>
+                        }
+                    </View>
+                    <View>
+                        <Text>{this.state.email}</Text>
                     </View>
                 </ScrollView>
             </View>
@@ -95,5 +117,8 @@ const styles = StyleSheet.create({
     ProfileName: {
         fontSize: 20,
         textAlign: 'center'
+    },
+    ProfileEditButtonView:{
+        flexDirection : 'row-reverse'
     }
 })

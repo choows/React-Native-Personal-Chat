@@ -71,6 +71,7 @@ export default class HomeScreen extends React.Component {
     }
     componentDidMount() {
         const state = store.getState();
+        this.setState({chat_message : []});
         //console.log("User ID : " + state.users.accountId);
         asyncGetUserCID(state.users.accountId).then((CID) => {
             let one_week_ago = new Date();

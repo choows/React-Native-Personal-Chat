@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text , TextInput, TouchableOpacity } from 'react-native'
 import firebase from 'react-native-firebase';
 import store from '../redux/store';
+import themeStyles from '../theme/ThemeManager';
 import * as userAction from '../redux/action/user';
 
 export default class HomeScreen extends React.Component {
