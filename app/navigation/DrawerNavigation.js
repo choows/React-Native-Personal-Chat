@@ -36,7 +36,8 @@ class SideMenu extends Component {
     }
     GetCurrentDayMemo = () => {
         const date = new Date();
-        const dayString = date.getFullYear().toString() + "-" + (date.getMonth() + 1).toString() + "-" + date.getDate();
+        const correct_date = date.getDate() < 10 ? "0"+ date.getDate().toString() : date.getDate.toString();
+        const dayString = date.getFullYear().toString() + "-" + (date.getMonth() + 1).toString() + "-" + correct_date;
         const path = MEMO_URL + "Detail/" + dayString + "/";
         this.GetMemoOnce(path, dayString);
     }

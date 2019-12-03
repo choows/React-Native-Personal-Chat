@@ -60,7 +60,9 @@ export default class NewMemoScreen extends React.Component {
     }
     DateDisplay = (dateString) => {
         let datestr = new Date(dateString);
-        return datestr.getFullYear() + "-" + (datestr.getUTCMonth() + 1) + "-" + datestr.getDate();
+        const correct_date = datestr.getDate() < 10 ? "0"+ datestr.getDate().toString() : datestr.getDate().toString();
+
+        return datestr.getFullYear() + "-" + (datestr.getUTCMonth() + 1) + "-" +correct_date;
     }
     ColorPicked = (colorcode) => {
         this.setState({ selected_color: colorcode });
@@ -92,7 +94,8 @@ export default class NewMemoScreen extends React.Component {
     }
     SubmitMemoDetail = () => {
         const date = new Date(this.state.from_date);
-        const yearmonthday = date.getFullYear() + '-' + (date.getMonth()+1).toString() + "-" + date.getDate();
+        const correct_date = date.getDate() < 10 ? "0"+ date.getDate().toString() : date.getDate().toString();
+        const yearmonthday = date.getFullYear() + '-' + (date.getMonth()+1).toString() + "-" + correct_date;
         const path = MEMO_URL + "Detail/" + yearmonthday + "/";
             firebase.database().ref(path).push({
                 title : this.state.text_title,

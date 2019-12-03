@@ -90,9 +90,9 @@ export default class MemoScreen extends React.Component {
     }
     componentDidMount = () => {
         const currentDate = new Date();
-        currentDate.setMonth(currentDate.getMonth() + 1);
-        const currentDateString = currentDate.getFullYear() + "-" + currentDate.getMonth() + "-" + currentDate.getDate();
-        this.setUpMonthlyMemo(currentDate.getFullYear().toString() + currentDate.getMonth().toString());
+       // currentDate.setMonth(currentDate.getMonth());
+        const currentDateString = currentDate.getFullYear() + "-" + (currentDate.getMonth() +1).toString() + "-" + currentDate.getDate();
+        this.setUpMonthlyMemo(currentDate.getFullYear().toString() + (currentDate.getMonth() + 1).toString());
         const nxtyear = new Date();
         nxtyear.setMonth(nxtyear.getMonth() + 1);
         nxtyear.setDate(nxtyear.getDate() + 365);
@@ -137,6 +137,7 @@ export default class MemoScreen extends React.Component {
     }
 
     setUpMonthlyMemo = (yearmonth) => {
+        console.log("YearMonth : " + yearmonth);
         /*
         {
                 '2019-11-28': {dots: [{color: 'green'}, {color: 'red'}, {color: 'yellow'}]},
@@ -145,6 +146,7 @@ export default class MemoScreen extends React.Component {
         */
         firebase.database().ref(MEMO_URL + "Overall/" + yearmonth).on('child_added', (snapshot) => {
             if (snapshot.exists) {
+                console.log("child_added called");
                 const result = snapshot.toJSON();
                 const color_arr = result['color'].split(',');
                 let json_arr = [];
@@ -165,6 +167,7 @@ export default class MemoScreen extends React.Component {
         });
         firebase.database().ref(MEMO_URL + "Overall/" + yearmonth).on('child_changed', (snapshot) => {
             if (snapshot.exists) {
+                console.log("child_changed called ");
                 const result = snapshot.toJSON();
                 const color_arr = result['color'].split(',');
                 let json_arr = [];
