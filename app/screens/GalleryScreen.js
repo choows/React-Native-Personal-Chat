@@ -5,12 +5,14 @@ import { EventRegister } from 'react-native-event-listeners';
 import firebase from 'react-native-firebase';
 import ImagePicker from 'react-native-image-picker';
 import { IMAGE_URL } from '../constants/url';
+import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynamic_main_background_color, dynamic_side_drawer_item_background } from '../theme/DynamicStyles';
+
 class Card extends React.Component {
     render() {
         return (
-            <View style={styles.CardView}>
+            <TouchableOpacity style={styles.CardView} onPress={()=>{this.props.OnImagePressed(this.props.UploadDate)}}>
                 <Image source={{ uri: this.props.path }} style={styles.Image} />
-            </View>
+            </TouchableOpacity>
         )
     }
 }
@@ -112,9 +114,13 @@ export default class GalleryScreen extends React.Component {
     GoToNext = () => {
         this.swiper.swipeRight();
     }
-    GoToFirst=()=>{
+    GoToFirst = () => {
         this.swiper.jumpToCardIndex(0);
     }
+    OnImagePress=(TimeStamp)=>{
+        console.log(TimeStamp);
+    }
+
     render() {
         return (
             <View style={styles.Container}>
@@ -127,23 +133,20 @@ export default class GalleryScreen extends React.Component {
                             cards={this.state.cards}
                             renderCard={(card) => {
                                 return (
-                                    <Card path={card.path} UploadDate={card.Date} key={card.Date} />
+                                    <Card path={card.path} UploadDate={card.Date} key={card.Date} OnImagePressed={this.OnImagePress}/>
                                 )
                             }}
                             cardIndex={0}
                             onSwipedLeft={() => { this.GoToPrevious }}
                             goBackToPreviousCardOnSwipeRight={true}
                             stackSize={3}
-                            backgroundColor={"#2e3659"}
+                            backgroundColor={dynamic_side_drawer_item_background()}
                             childrenOnTop={true}
-                            //infinite={true}
-                            cardHorizontalMargin={10}
-                            cardVerticalMargin={10}
-                            
+                            infinite={true}
+                            cardHorizontalMargin={0}
+                            cardVerticalMargin={0}
+
                         >
-                            <TouchableOpacity onPress={this.GoToFirst}>
-                                <Text>Go To First</Text>
-                            </TouchableOpacity>
                         </Swiper>
                         :
                         <View></View>
@@ -193,11 +196,16 @@ const styles = StyleSheet.create({
     CardView: {
         backgroundColor: 'white',
         height: '80%',
-        width: '80%'
+        width: '100%'
     },
     Image: {
         height: '100%',
         width: '100%',
-        resizeMode: 'contain'
+        resizeMode: 'stretch'
+    },
+    DateDisplay : {
+        height : '100%',
+        width : '100%',
+        textAlign : 'justify',
     }
 })
