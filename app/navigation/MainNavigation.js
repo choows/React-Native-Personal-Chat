@@ -35,7 +35,10 @@ const MapStack = createStackNavigator({
     Map: {
         screen: MapScreen,
         navigationOptions: {
-            title: 'Map'
+            title: 'Map',
+            headerStyle : {
+                backgroundColor : dynamic_side_drawer_header_color()
+            },
         }
     }
 })
@@ -47,19 +50,28 @@ const MemoStack = createStackNavigator({
                 top: 'never',
                 bottom: 'never'
             } : {},
-            headerTitle: <MemoHeader navigate={navigation} />
+            headerTitle: <MemoHeader navigate={navigation} /> ,
+            headerStyle : {
+                backgroundColor : dynamic_side_drawer_header_color()
+            },
         })
     },
     NewMemo: {
         screen: NewMemoScreen,
         navigationOptions: {
-            title: 'New Memo'
+            title: 'New Memo' , 
+            headerStyle : {
+                backgroundColor : dynamic_side_drawer_header_color()
+            },
         }
     },
     EditMemo: {
         screen: MemoScreenEdit,
         navigationOptions: {
-            title: 'Edit'
+            title: 'Edit' , 
+            headerStyle : {
+                backgroundColor : dynamic_side_drawer_header_color()
+            },
         }
     }
 })
@@ -71,7 +83,10 @@ const GalleryStack = createStackNavigator({
                 top: 'never',
                 bottom: 'never'
             } : {},
-            headerTitle: <GalleryHeader navigate={navigation} />
+            headerTitle: <GalleryHeader navigate={navigation} /> , 
+            headerStyle : {
+                backgroundColor : dynamic_side_drawer_header_color()
+            },
         })
     }
 });
@@ -79,7 +94,10 @@ const SettingStack = createStackNavigator({
     Setting: {
         screen: SettingScreen,
         navigationOptions: {
-            title: 'Setting'
+            title: 'Setting' , 
+            headerStyle : {
+                backgroundColor : dynamic_side_drawer_header_color()
+            },
         }
     }
 });

@@ -6,6 +6,7 @@ import Geolocation from '@react-native-community/geolocation';
 import { LOCATION_URL } from '../constants/url';
 import store from '../redux/store';
 import { EventRegister } from 'react-native-event-listeners';
+import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynamic_main_background_color, dynamic_side_drawer_item_background } from '../theme/DynamicStyles';
 
 export default class MapScreen extends React.Component {
     state = {
@@ -75,14 +76,14 @@ export default class MapScreen extends React.Component {
                     this.state.marker[index] = unknown_marker;
                     this.setState({ marker: this.state.marker });
                 }
-                if(state.users.accountId === unknown_marker["UID"]){
+                if (state.users.accountId === unknown_marker["UID"]) {
                     let new_region = {
                         latitude: unknown_marker.latitude,
                         longitude: unknown_marker.longitude,
                         latitudeDelta: 0.0922,
                         longitudeDelta: 0.0421,
                     }
-                    this.setState({region : new_region});
+                    this.setState({ region: new_region });
                 }
                 this.focusOnMarkers();
                 console.log("Done set marker ...");
@@ -182,7 +183,7 @@ export default class MapScreen extends React.Component {
                 }
 
                 <TouchableOpacity style={styles.ButtonViewContainer} onPress={this.SendLocation}>
-                    <Text style={{ height: '100%', width: '100%', textAlign: 'center' }}>Start Listen</Text>
+                    <Text style={styles.ButtonText}>{this.state.listening ? "STOP" : "START"}</Text>
                 </TouchableOpacity>
             </View>
         )
@@ -200,6 +201,13 @@ const styles = StyleSheet.create({
     },
     ButtonViewContainer: {
         width: '100%',
-        height: '10%'
+        height: '10%',
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: dynamic_side_drawer_icon_color()
+    },
+    ButtonText: {
+        fontSize: 20
     }
 })
