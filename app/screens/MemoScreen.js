@@ -6,8 +6,6 @@ import { NavigationActions } from 'react-navigation';
 import firebase from 'react-native-firebase';
 import { MEMO_URL } from '../constants/url';
 class Memo extends React.Component {
-    /*Display as .......    Text : Dot With Color */
-
 
     navigateToDetails = () => {
         const path = MEMO_URL + "Detail/" + this.props.date + "/" + this.props.keyword ;

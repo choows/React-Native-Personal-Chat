@@ -40,6 +40,7 @@ class SideMenu extends Component {
         const dayString = date.getFullYear().toString() + "-" + (date.getMonth() + 1).toString() + "-" + correct_date;
         const path = MEMO_URL + "Detail/" + dayString + "/";
         this.GetMemoOnce(path, dayString);
+        this.GetMemoOn(path , dayString);
     }
     NavigateToMemoDetail = (memo) => {
         //console.log("Memo Here");
@@ -53,6 +54,15 @@ class SideMenu extends Component {
             title : memo.title,
             date : memo.date
         });
+    }
+    GetMemoOn =(path , yearmonthday)=>{
+        firebase.database().ref(path).on('child_added', (snapshot) => {
+            if (snapshot.exists) {
+                if (snapshot.toJSON() !== null) {
+                    this.GetMemoOnce(path , yearmonthday);
+                }
+            }
+        })
     }
     GetMemoOnce = (path, yearmonthday) => {
         firebase.database().ref(path).once('value', (snapshot) => {

@@ -5,6 +5,7 @@ import { MemoColor } from '../constants/ColorCode';
 import { ColorPicker, TriangleColorPicker, fromHsv } from 'react-native-color-picker'
 import firebase from 'react-native-firebase';
 import { MEMO_URL } from '../constants/url';
+import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynamic_main_background_color, dynamic_side_drawer_item_background } from '../theme/DynamicStyles';
 class Color extends React.Component {
     render() {
         return (
@@ -30,7 +31,7 @@ export default class NewMemoScreen extends React.Component {
         color_picker_visible: false,
         selected_color: '#ffffff',
         current_date_setted_color: '',
-        text_title : ''
+        text_title: ''
     }
     componentDidMount() {
         this.GetCurrentDateColor(this.state.from_date);
@@ -60,9 +61,9 @@ export default class NewMemoScreen extends React.Component {
     }
     DateDisplay = (dateString) => {
         let datestr = new Date(dateString);
-        const correct_date = datestr.getDate() < 10 ? "0"+ datestr.getDate().toString() : datestr.getDate().toString();
+        const correct_date = datestr.getDate() < 10 ? "0" + datestr.getDate().toString() : datestr.getDate().toString();
 
-        return datestr.getFullYear() + "-" + (datestr.getUTCMonth() + 1) + "-" +correct_date;
+        return datestr.getFullYear() + "-" + (datestr.getUTCMonth() + 1) + "-" + correct_date;
     }
     ColorPicked = (colorcode) => {
         this.setState({ selected_color: colorcode });
@@ -94,18 +95,18 @@ export default class NewMemoScreen extends React.Component {
     }
     SubmitMemoDetail = () => {
         const date = new Date(this.state.from_date);
-        const correct_date = date.getDate() < 10 ? "0"+ date.getDate().toString() : date.getDate().toString();
-        const yearmonthday = date.getFullYear() + '-' + (date.getMonth()+1).toString() + "-" + correct_date;
+        const correct_date = date.getDate() < 10 ? "0" + date.getDate().toString() : date.getDate().toString();
+        const yearmonthday = date.getFullYear() + '-' + (date.getMonth() + 1).toString() + "-" + correct_date;
         const path = MEMO_URL + "Detail/" + yearmonthday + "/";
-            firebase.database().ref(path).push({
-                title : this.state.text_title,
-                text : this.state.text_detail,
-                color : this.state.selected_color
-            }).then((res)=>{
-                console.log("Done Push To Firebase.");
-            }).catch((err)=>{
-                console.log("Push To Firebase Error : " + err);
-            });
+        firebase.database().ref(path).push({
+            title: this.state.text_title,
+            text: this.state.text_detail,
+            color: this.state.selected_color
+        }).then((res) => {
+            console.log("Done Push To Firebase.");
+        }).catch((err) => {
+            console.log("Push To Firebase Error : " + err);
+        });
     }
     render() {
         return (
@@ -122,10 +123,10 @@ export default class NewMemoScreen extends React.Component {
                         />
                     </View>
                 </Modal>
-                <View style={styles.SectionView}>
-                    <Text>Date : </Text>
-                    <TouchableOpacity onPress={() => { this.setState({ display_from: true }) }}>
-                        <Text>{this.DateDisplay(this.state.from_date)}</Text>
+                <View style={{ flexDirection: 'row', height: '10%', width: '95%', alignContent: 'center', alignItems: 'center', margin: '2%' }}>
+                    <Text style={{ width: '20%', fontSize: 25 }}>Date : </Text>
+                    <TouchableOpacity style={{ width: '80%', flexDirection: 'row-reverse' }} onPress={() => { this.setState({ display_from: true }) }}>
+                        <Text style={{ fontSize: 25 }}>{this.DateDisplay(this.state.from_date)}</Text>
                     </TouchableOpacity>
 
                     {
@@ -136,37 +137,45 @@ export default class NewMemoScreen extends React.Component {
                             onChange={this.setFrom_date} />
                     }
                 </View>
-                <View style={styles.SectionView}>
-                    <Text>Color :   </Text>
-                    <ScrollView horizontal={true}>
+                <View style={{ flexDirection: 'row', height: '5%', width: '95%', alignContent: 'center', alignItems: 'center', margin: '2%' }}>
+                    <ScrollView horizontal={true} style={{ width: '90%' }}>
                         {
                             MemoColor.map((color) =>
                                 <Color colorcode={color} key={color} onpress={this.ColorPicked} onlongpress={this.OnColorLongPress} />
                             )
                         }
                     </ScrollView>
-                    <View style={{
-                        backgroundColor: this.state.selected_color,
-                        borderRadius: 300,
-                        width: 20,
-                        height: 20,
-                        marginRight: 10,
-                        borderWidth: 2,
-                        borderColor: 'black',
-                        marginRight: 0
-                    }}>
-                        <Text></Text>
+                    <View style={{ width: '10%' }}>
+                        <View style={{
+                            backgroundColor: this.state.selected_color,
+                            borderRadius: 300,
+                            width: 20,
+                            height: 20,
+                            marginRight: 10,
+                            borderWidth: 2,
+                            borderColor: 'black',
+                            marginRight: 0
+                        }}>
+                            <Text></Text>
+                        </View>
                     </View>
+
                 </View>
-                <View style={{ flexDirection: 'row' }}>
-                    <Text>Title :   </Text>
-                    <TextInput multiline={false} autoCorrect={true} editable={true} value={this.state.text_title} onChangeText={(text) => { this.setState({ text_title: text }) }} />
+                <View style={{ flexDirection: 'row', minHeight: '10%', width: '95%', alignContent: 'center', alignItems: 'center', margin: '2%' }}>
+                    <Text style={{ width: '20%', fontSize: 25 }}>Title :   </Text>
+                    <TextInput 
+                    multiline={false} 
+                    autoCorrect={true} 
+                    editable={true} 
+                    value={this.state.text_title} 
+                    onChangeText={(text) => { this.setState({ text_title: text }) }} 
+                    style={{width : '80%' ,borderWidth : 0.3, maxHeight : 40 , fontSize : 20 , fontWeight : 'bold'}}/>
                 </View>
-                <View style={{ flexDirection: 'row' }}>
-                    <Text>Detail :   </Text>
+                <View style={styles.SectionView}>
+                    <Text style={{ width: '20%', fontSize: 25 }}>Detail :   </Text>
                     <TextInput multiline={true} autoCorrect={true} editable={true} value={this.state.text_detail} onChangeText={(text) => { this.setState({ text_detail: text }) }} />
                 </View>
-                <View style={{ flexDirection: 'row' }}>
+                <View style={styles.SectionView}>
                     <TouchableOpacity onPress={this.SubmitNewMemo}>
                         <Text>Done</Text>
                     </TouchableOpacity>
@@ -183,12 +192,24 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         height: '100%',
-        flex: 1,
-        justifyContent: 'center'
+        backgroundColor: dynamic_side_drawer_item_background()
     },
     SectionView: {
-        width: '100%',
-        height: '10%',
-        flexDirection: 'row'
+        width: '98%',
+        flexDirection: 'row',
+        marginLeft: '2%',
+        alignItems: 'center',
+        alignContent: 'center',
+        backgroundColor: 'white',
+        marginRight: '2%',
+        marginTop: '2%'
+    },
+    TitleTextView: {
+        borderWidth: 0.4,
+    },
+    TextStyle: {
+        width: '20%',
+        height: '100%',
+        fontSize: 20
     }
 })
