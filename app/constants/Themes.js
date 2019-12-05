@@ -1,1 +1,1 @@
-export default Themes = ['Pink' , 'Blue'];
+export default Themes = ['PinkTheme' , 'BlueTheme'];

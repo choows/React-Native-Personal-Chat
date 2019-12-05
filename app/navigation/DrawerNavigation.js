@@ -100,7 +100,7 @@ class SideMenu extends Component {
             <SafeAreaView>
                 <View style={[{ height: '100%', width: '100%', backgroundColor: dynamic_side_drawer_item_background() }]}>
                     <ScrollView>
-                        <TouchableOpacity style={[cus_style.Profile_View_Container, { backgroundColor: dynamic_side_drawer_header_color() }]} onPress={() => { this.navigateToScreen('Setting') }}>
+                        <TouchableOpacity style={[cus_style.Profile_View_Container, { backgroundColor: dynamic_side_drawer_header_color() }]} onPress={() => { this.navigateToScreen('Profile') }}>
                             <View style={cus_style.ProfileImageViewContainer}>
                                 <Image source={{ uri: state.users.ProfileImage }} style={cus_style.ProfileImage} />
                             </View>

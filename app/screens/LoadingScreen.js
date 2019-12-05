@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View , Text} from 'react-native'
+import {View , Text , StyleSheet, Image} from 'react-native'
 import firebase from 'react-native-firebase';
 import store from '../redux/store';
 import * as userAction from '../redux/action/user';
@@ -16,7 +16,6 @@ export default class HomeScreen extends Component{
                 const state = store.getState();
                 if(state.users.accountId !== ''){
                     clearInterval(checker);
-                    themeStyles.setTheme('PinkTheme');
                     this.props.navigation.navigate('Home');
                 }
             } , 1000)
@@ -26,7 +25,24 @@ export default class HomeScreen extends Component{
     }   
     render(){
         return(
-            <View><Text>Loading Screen</Text></View>
+            <View style={styles.container}>
+                <Image source={require('../assets/TransparentSplashScreen.jpg') } style={styles.ImageStyle}/>
+            </View>
         )
     }
 }
+
+const styles = StyleSheet.create({
+    container : {
+        width : '100%',
+        height : '100%',
+        flex : 1,
+        justifyContent : 'center',
+        alignContent : 'center',
+        alignItems: 'center',
+    },
+    ImageStyle : {
+        width : '100%',
+        height : '70%'
+    }
+})

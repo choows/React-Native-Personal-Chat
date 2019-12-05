@@ -17,6 +17,7 @@ import NewMemoScreen from '../screens/NewMemoScreen';
 import MemoScreenEdit from '../screens/MemoScreenEdit';
 import SettingScreen from '../screens/SettingScreen';
 import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynamic_main_background_color } from '../theme/DynamicStyles';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const HomeStack = createStackNavigator({
     Home: {
@@ -30,6 +31,17 @@ const HomeStack = createStackNavigator({
     }
 });
 
+const ProfileStack = createStackNavigator({
+    Profile : {
+        screen : ProfileScreen,
+        navigationOptions : {
+            headerTitle : 'Profile',
+            headerStyle : {
+                backgroundColor : dynamic_side_drawer_header_color()
+            }
+        }
+    }
+})
 
 const MapStack = createStackNavigator({
     Map: {
@@ -116,6 +128,9 @@ const MainDrawerNavigator = createDrawerNavigator({
     },
     Setting: {
         screen: SettingStack
+    },
+    Profile : {
+        screen : ProfileStack
     }
 },
     {
