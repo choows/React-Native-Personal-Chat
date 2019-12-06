@@ -13,7 +13,6 @@ export default class App extends React.Component {
     super();
     this.state = {};
   }
-
   async componentDidMount() {
     EventRegister.addEventListener('Toast' , (message)=>{
       this.refs.toast.show(message , 1000);

@@ -60,7 +60,8 @@ export default class GalleryScreen extends React.Component {
             if (index === -1) {
                 this.state.cards.unshift({
                     Date: result["DateTime"],
-                    path: result["path"]
+                    path: result["path"],
+                    url : result["url"]
                 });
                 this.setState({ cards: this.state.cards });
             }
@@ -77,7 +78,8 @@ export default class GalleryScreen extends React.Component {
             if (index === -1) {
                 this.state.cards.unshift({
                     Date: result["DateTime"],
-                    path: result["path"]
+                    path: result["path"],
+                    url : result['url']
                 });
                 this.setState({ cards: this.state.cards });
             }
@@ -93,17 +95,18 @@ export default class GalleryScreen extends React.Component {
         const currentDate = new Date().getTime();
         let storage_path = currentDate.toString();
         firebase.storage().ref(storage_path).putFile(path).then((response) => {
-            this.UploadToFirebaseDatabase(response.downloadURL);
+            this.UploadToFirebaseDatabase(response.downloadURL , path);
         }).catch((err) => {
             console.log("Upload Error : " + err);
         });
     }
 
-    UploadToFirebaseDatabase = (path) => {
+    UploadToFirebaseDatabase = (path , url) => {
         const currentDate = new Date().getTime().toString();
         firebase.database().ref(IMAGE_URL + "/" + currentDate).set({
             path: path,
-            DateTime: currentDate
+            DateTime: currentDate,
+            url : url
         }).then(()=>{
             EventRegister.emit("Toast" , "Upload Image Successfully");
         })

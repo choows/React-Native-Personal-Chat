@@ -6,12 +6,13 @@ import { MESSAGE_URL } from '../constants/url';
 import { GetDearImageAndName } from '../util/UserSetup';
 import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynamic_main_background_color } from '../theme/DynamicStyles';
 import { EventRegister } from 'react-native-event-listeners';
-
+import {SendMessage} from '../util/FirebaseCloudMessage';
 class MessageDetail extends React.Component {
     state = {
         UserId: '',
     }
     componentDidMount() {
+        SendMessage("Hi" , "Body");
         const state = store.getState();
         this.setState({ UserId: state.users.accountId });
         //console.log(state.users.accountId);
