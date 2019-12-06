@@ -182,10 +182,10 @@ export default class HomeScreen extends React.Component {
                         </View>
                     </ScrollView>
                     <View style={styles.senderContainer}>
-                        <View style={{height : '100%' , width : '90%'}}>
+                        <View style={{height : '100%' , width : '80%' , marginBottom : 5}}>
                             <TextInput style={styles.textinput} value={this.state.message} onChangeText={(text) => { this.setState({ message: text }) }} />
                         </View>
-                        <TouchableOpacity onPress={this.sendMessage} style={{ width: '10%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                        <TouchableOpacity onPress={this.sendMessage} style={{ width: '20%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
                             <Image source={require('../assets/arrow_icon.png')} style={{ width: 40, height: 40, resizeMode: 'contain', tintColor: dynamic_side_drawer_icon_color() }} />
                         </TouchableOpacity>
                     </View>
