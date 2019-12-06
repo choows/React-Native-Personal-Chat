@@ -104,7 +104,10 @@ export default class GalleryScreen extends React.Component {
         firebase.database().ref(IMAGE_URL + "/" + currentDate).set({
             path: path,
             DateTime: currentDate
-        }).catch((err) => {
+        }).then(()=>{
+            EventRegister.emit("Toast" , "Upload Image Successfully");
+        })
+        .catch((err) => {
             console.log("Upload to Database Error : " + err);
         });
     }
