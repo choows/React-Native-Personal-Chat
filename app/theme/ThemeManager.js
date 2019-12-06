@@ -10,7 +10,7 @@ export default themeStyles = new ThemeManager({
     BlueTheme : {
         main_background_color : 'white',
         header_background_color : '#2b3fd6',
-        side_drawer_icon_color : '#1a2aa3',
+        side_drawer_icon_color : '#3e58b0',
         side_drawer_item_background : '#9698eb'
     }
 });
