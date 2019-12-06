@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, TextInput 
 import store from '../redux/store';
 import firebase from 'react-native-firebase';
 import ImagePicker from 'react-native-image-picker';
-
+import * as useractions from '../redux/action/user';
+import { EventRegister } from 'react-native-event-listeners';
 export default class ProfileScreen extends React.Component {
     state = {
         profile_image: '',
@@ -33,12 +34,14 @@ export default class ProfileScreen extends React.Component {
     }
 
     UpdateProfile = () => {
+        const state = store.getState();
         firebase.auth().currentUser.updateProfile({
             photoURL: this.state.profile_image,
             displayName: this.state.display_name,
         }).then(() => {
-            console.log("Done Update Profile");
-        }).catch((err)=>{
+            store.dispatch(useractions.Setup(state.users.accountId, this.state.display_name, state.users.Email, this.state.profile_image));
+            EventRegister.emit("Toast", "Update Profile Successfully");
+        }).catch((err) => {
             console.log("Error : " + err);
         });
     }
@@ -62,9 +65,18 @@ export default class ProfileScreen extends React.Component {
             <View style={styles.container}>
                 <ScrollView style={styles.container}>
                     <View style={styles.ProfileEditButtonView}>
-                        <TouchableOpacity onPress={this.ProfileEdit}>
-                            <Text>{this.state.EditProfile ? "Done" : "Edit"}</Text>
+                        {
+                            this.state.EditProfile ?
+                                <TouchableOpacity onPress={() => { this.setState({ EditProfile: !this.state.EditProfile }) }} style={{ backgroundColor: 'blue', borderRadius: 50, marginTop: 10, marginRight: 10 }}>
+                                    <Text style={{ marginHorizontal: 10, marginVertical: 1, color: 'white' }}>Cancel</Text>
+                                </TouchableOpacity>
+                                :
+                                null
+                        }
+                        <TouchableOpacity onPress={this.ProfileEdit} style={{ backgroundColor: 'blue', borderRadius: 50, marginTop: 10, marginRight: 10 }}>
+                            <Text style={{ marginHorizontal: 10, marginVertical: 1, color: 'white' }}>{this.state.EditProfile ? "Done" : "Edit"}</Text>
                         </TouchableOpacity>
+
                     </View>
                     <View style={styles.ImageViewcontainer}>
                         <TouchableOpacity onPress={this.state.EditProfile ? this.ShowImagePicker : null} style={styles.Image}>
@@ -74,13 +86,18 @@ export default class ProfileScreen extends React.Component {
                     <View style={styles.ProfileNamecontainer}>
                         {
                             this.state.EditProfile ?
-                                <TextInput value={this.state.display_name} onChangeText={(text) => { this.setState({ display_name: text }) }} multiline={false} />
+                                <TextInput value={this.state.display_name} onChangeText={(text) => { this.setState({ display_name: text }) }} multiline={false} style={{ borderWidth: 0.2, textAlign: 'center', borderRadius: 50, marginVertical: 2, marginHorizontal: 5 }} />
                                 :
                                 <Text>{this.state.display_name}</Text>
                         }
                     </View>
-                    <View>
-                        <Text>{this.state.email}</Text>
+                    <View style={{ flexDirection: 'row', width: '100%', height: '20%', borderWidth: 0.1 }}>
+                        <View style={{ width: '20%', borderWidth: 0.1 }}>
+                            <Text style={{ margin: 5 }}>Email</Text>
+                        </View>
+                        <View style={{ width: '80%', borderWidth: 0.1 }}>
+                            <Text style={{ margin: 5 }}>{this.state.email}</Text>
+                        </View>
                     </View>
                 </ScrollView>
             </View>
@@ -118,7 +135,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: 'center'
     },
-    ProfileEditButtonView:{
-        flexDirection : 'row-reverse'
+    ProfileEditButtonView: {
+        flexDirection: 'row-reverse'
     }
 })

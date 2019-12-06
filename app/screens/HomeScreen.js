@@ -28,7 +28,7 @@ class MessageDetail extends React.Component {
             //self
             return (
                 <View style={[styles.SelfTextContainer, styles.CommonTextContainer]}>
-                    <View style={styles.SelfTextView}>
+                    <View style={[styles.SelfTextView , {backgroundColor: dynamic_side_drawer_icon_color()}]}>
                         <View style={{ margin: 8 }}>
                             <Text style={styles.ChatMessageText}>{this.props.message_detail.message.Detail}</Text>
                         </View>
@@ -182,8 +182,10 @@ export default class HomeScreen extends React.Component {
                         </View>
                     </ScrollView>
                     <View style={styles.senderContainer}>
-                        <TextInput style={styles.textinput} value={this.state.message} onChangeText={(text) => { this.setState({ message: text }) }} />
-                        <TouchableOpacity onPress={this.sendMessage} style={{ width: '20%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                        <View style={{height : '100%' , width : '90%'}}>
+                            <TextInput style={styles.textinput} value={this.state.message} onChangeText={(text) => { this.setState({ message: text }) }} />
+                        </View>
+                        <TouchableOpacity onPress={this.sendMessage} style={{ width: '10%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
                             <Image source={require('../assets/arrow_icon.png')} style={{ width: 40, height: 40, resizeMode: 'contain', tintColor: dynamic_side_drawer_icon_color() }} />
                         </TouchableOpacity>
                     </View>
@@ -212,7 +214,7 @@ const styles = StyleSheet.create({
         marginBottom: '1%'
     },
     textinput: {
-        width: '80%',
+        width: '100%',
         height: 40,
         borderColor: 'black',
         borderWidth: 0.3,
@@ -256,9 +258,8 @@ const styles = StyleSheet.create({
         marginRight: '5%',
         borderWidth: 0.4,
         borderBottomLeftRadius: 150,
-        borderBottomRightRadius: 150,
-        borderTopLeftRadius: 150,
-        backgroundColor : dynamic_side_drawer_icon_color()
+        borderTopRightRadius: 150,
+        borderTopLeftRadius: 150
     },
     Chat_Message_Profile_Image: {
         height: 40,

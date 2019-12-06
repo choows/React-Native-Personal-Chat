@@ -12,6 +12,12 @@ export default class GalleryHeader extends React.Component {
     render() {
         return (
             <View style={styles.HeaderContainer}>
+                <TouchableOpacity style={styles.BurgerIconView} onPress={()=>{this.props.navigate.openDrawer()}}>
+                    <Icon
+                        name='bars' 
+                        type='font-awesome'
+                        />
+                </TouchableOpacity>
                 <View style={styles.TextContainer}>
                     <Text style={styles.TitleText}>Gallery</Text>
                 </View>
@@ -39,13 +45,20 @@ const styles = StyleSheet.create({
         right: 0,
         resizeMode: 'contain'
     },
+    BurgerIconView: {
+        width: '10%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems : 'center',
+        alignContent : 'center'
+    },
     ImageContainer: {
         width: '10%',
         height: '100%',
         flexDirection: 'row-reverse'
     },
     TextContainer: {
-        width: '90%',
+        width: '80%',
         height: '50%',
         flex : 1,
         justifyContent : 'center',

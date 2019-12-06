@@ -32,6 +32,8 @@ export default class MapScreen extends React.Component {
         }).then((granted) => {
             console.log('granted', granted);
             // always returns never_ask_again
+        }).catch((err)=>{
+            console.log("Permission Request Failed");
         })
     }
     componentDidMount() {
@@ -182,7 +184,7 @@ export default class MapScreen extends React.Component {
                     </View>
                 }
 
-                <TouchableOpacity style={styles.ButtonViewContainer} onPress={this.SendLocation}>
+                <TouchableOpacity style={[styles.ButtonViewContainer , {backgroundColor: dynamic_side_drawer_icon_color()}]} onPress={this.SendLocation}>
                     <Text style={styles.ButtonText}>{this.state.listening ? "STOP" : "START"}</Text>
                 </TouchableOpacity>
             </View>
@@ -204,8 +206,7 @@ const styles = StyleSheet.create({
         height: '10%',
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: dynamic_side_drawer_icon_color()
+        alignItems: 'center'
     },
     ButtonText: {
         fontSize: 20

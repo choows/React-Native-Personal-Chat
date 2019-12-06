@@ -5,28 +5,35 @@ import { EventRegister } from 'react-native-event-listeners';
 import { NavigationActions } from 'react-navigation';
 import firebase from 'react-native-firebase';
 import { MEMO_URL } from '../constants/url';
+import { dynamic_main_background_color } from '../theme/DynamicStyles';
 class Memo extends React.Component {
 
     navigateToDetails = () => {
-        const path = MEMO_URL + "Detail/" + this.props.date + "/" + this.props.keyword ;
+        const path = MEMO_URL + "Detail/" + this.props.date + "/" + this.props.keyword;
 
         this.props.navigation.navigate('EditMemo', {
-            path : path,
-            color : this.props.color,
-            text : this.props.text,
-            title : this.props.title,
-            date : this.props.date
+            path: path,
+            color: this.props.color,
+            text: this.props.text,
+            title: this.props.title,
+            date: this.props.date
         });
     }
 
     render() {
         return (
-            <View style={{ width: '100%', height: 40, flexDirection: 'row', alignContent: 'center' }}>
-                <TouchableOpacity onPress={this.navigateToDetails} style={{height : '100%' , width : '100%' , flexDirection : 'row' , alignContent : 'stretch'}}>
-                    <View style={{ backgroundColor: this.props.color, borderRadius: 300, width: 20, height: 20, marginRight: 10, borderWidth: 1, borderColor: 'black' }}>
-                        <Text></Text>
+            <View style={{ width: '100%', height: 40, flexDirection: 'row', alignContent: 'center', marginTop: 5, borderWidth: 0.1 }}>
+                <TouchableOpacity onPress={this.navigateToDetails} style={{ height: '100%', width: '100%', flexDirection: 'row', alignContent: 'stretch' }}>
+                    <View style={{ height: '100%', alignContent: 'center', justifyContent: 'center', alignItems: 'center' }}>
+
+                        <View style={{ backgroundColor: this.props.color, borderRadius: 300, width: 30, height: 30, marginRight: 10, borderWidth: 1, borderColor: 'black' }}>
+                            <Text></Text>
+                        </View>
                     </View>
-                    <Text>{this.props.title}</Text>
+                    <View style={{ height: '100%', alignContent: 'center', justifyContent: 'center', alignItems: 'center' }}>
+                        <Text>{this.props.title}</Text>
+                    </View>
+
                 </TouchableOpacity>
 
             </View>
@@ -88,8 +95,8 @@ export default class MemoScreen extends React.Component {
     }
     componentDidMount = () => {
         const currentDate = new Date();
-       // currentDate.setMonth(currentDate.getMonth());
-        const currentDateString = currentDate.getFullYear() + "-" + (currentDate.getMonth() +1).toString() + "-" + currentDate.getDate();
+        // currentDate.setMonth(currentDate.getMonth());
+        const currentDateString = currentDate.getFullYear() + "-" + (currentDate.getMonth() + 1).toString() + "-" + currentDate.getDate();
         this.setUpMonthlyMemo(currentDate.getFullYear().toString() + (currentDate.getMonth() + 1).toString());
         const nxtyear = new Date();
         nxtyear.setMonth(nxtyear.getMonth() + 1);
@@ -104,8 +111,8 @@ export default class MemoScreen extends React.Component {
             });
             this.props.navigation.dispatch(navigateAction);
         });
-        EventRegister.addEventListener("RefreshMemoWithDate" , (yearmonthday)=>{
-                this.setUpMemoDetail(yearmonthday);
+        EventRegister.addEventListener("RefreshMemoWithDate", (yearmonthday) => {
+            this.setUpMemoDetail(yearmonthday);
         });
     }
 
@@ -123,7 +130,7 @@ export default class MemoScreen extends React.Component {
                             date: yearmonthday,
                             key: key,
                             color: details["color"],
-                            title : details["title"]
+                            title: details["title"]
                         });
                     });
                     this.setState({ Memos: new_arr });
@@ -159,7 +166,7 @@ export default class MemoScreen extends React.Component {
                     dots: json_arr
                 };
                 this.setState({ markedDates: this.state.markedDates }, () => {
-                   // this.setState({ visible: true });
+                    // this.setState({ visible: true });
                 });
             }
         });
@@ -180,7 +187,7 @@ export default class MemoScreen extends React.Component {
                     dots: json_arr
                 };
                 this.setState({ markedDates: this.state.markedDates }, () => {
-                  //  this.setState({ visible: true });
+                    //  this.setState({ visible: true });
                 });
             }
         })
@@ -226,7 +233,7 @@ export default class MemoScreen extends React.Component {
                     <ScrollView>
                         {
                             this.state.Memos.map((memo) =>
-                                <Memo text={memo.text} title={memo.title} key={memo.key} date={memo.date} color={memo.color} keyword={memo.key} navigation={this.props.navigation}/>)
+                                <Memo text={memo.text} title={memo.title} key={memo.key} date={memo.date} color={memo.color} keyword={memo.key} navigation={this.props.navigation} />)
                         }
                     </ScrollView>
                 </View>
@@ -248,6 +255,10 @@ const styles = StyleSheet.create({
     },
     detailsView: {
         height: '40%',
-        width: '100%'
+        width: '90%',
+        marginHorizontal: '5%',
+        backgroundColor: dynamic_main_background_color(),
+        marginTop: 5,
+        borderTopWidth: 1
     }
 })

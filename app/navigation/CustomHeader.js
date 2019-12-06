@@ -3,11 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { EventRegister } from 'react-native-event-listeners';
 import { Icon, Divider } from 'react-native-elements';
 
-export default class MemoHeader extends React.Component {
+export default class CustomHeader extends React.Component {
 
-    OnImageIconPressed = () => {
-        EventRegister.emit("AddNewMemo" , null);
-    }
 
     render() {
         return (
@@ -18,13 +15,8 @@ export default class MemoHeader extends React.Component {
                         type='font-awesome'
                         />
                 </TouchableOpacity>
-                 <View style={styles.TextContainer}>
-                    <Text style={styles.TitleText}>Memo</Text>
-                </View>
-                <View style={styles.ImageContainer}>
-                    <TouchableOpacity onPress={this.OnImageIconPressed} style={styles.HeaderContainer}>
-                    <Icon name='plus' type='font-awesome'/>                    
-                    </TouchableOpacity>
+                <View style={styles.TextContainer}>
+                    <Text style={styles.TitleText}>{this.props.HeaderTitle}</Text>
                 </View>
             </View>
         )
@@ -57,17 +49,17 @@ const styles = StyleSheet.create({
         flexDirection: 'row-reverse'
     },
     TextContainer: {
-        width: '80%',
+        width: '90%',
         height: '50%',
-        flex : 1,
-        justifyContent : 'center',
-        alignItems : 'center'
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     TitleText: {
-        height : '100%',
-        flex : 1,
-        fontSize : 20,
-        marginLeft : 10,
-        alignSelf : 'flex-start'
+        height: '100%',
+        flex: 1,
+        fontSize: 20,
+        marginLeft: 10,
+        alignSelf: 'flex-start'
     }
 })

@@ -18,40 +18,53 @@ import MemoScreenEdit from '../screens/MemoScreenEdit';
 import SettingScreen from '../screens/SettingScreen';
 import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynamic_main_background_color } from '../theme/DynamicStyles';
 import ProfileScreen from '../screens/ProfileScreen';
-
+import CustomHeader from './CustomHeader';
+import CustomInnerHeader from './CustomInnerHeader';
 const HomeStack = createStackNavigator({
     Home: {
         screen: HomeScreen,
-        navigationOptions: {
-            headerTitle : 'Home',
-            headerStyle : {
-                backgroundColor : dynamic_side_drawer_header_color()
+        navigationOptions: ({ navigation }) => ({
+            headerForceInset: Platform.OS === "ios" ? {
+                top: 'never',
+                bottom: 'never'
+            } : {},
+            headerTitle: <CustomHeader navigate={navigation} HeaderTitle={"Home"} />,
+            headerStyle: {
+                backgroundColor: dynamic_side_drawer_header_color()
             },
-        }
+        })
     }
 });
 
 const ProfileStack = createStackNavigator({
-    Profile : {
-        screen : ProfileScreen,
-        navigationOptions : {
-            headerTitle : 'Profile',
-            headerStyle : {
-                backgroundColor : dynamic_side_drawer_header_color()
-            }
-        }
+    Profile: {
+        screen: ProfileScreen,
+        navigationOptions: ({ navigation }) => ({
+            headerForceInset: Platform.OS === "ios" ? {
+                top: 'never',
+                bottom: 'never'
+            } : {},
+            headerTitle: <CustomHeader navigate={navigation} HeaderTitle={"Profile"} />,
+            headerStyle: {
+                backgroundColor: dynamic_side_drawer_header_color()
+            },
+        })
     }
 })
 
 const MapStack = createStackNavigator({
     Map: {
         screen: MapScreen,
-        navigationOptions: {
-            title: 'Map',
-            headerStyle : {
-                backgroundColor : dynamic_side_drawer_header_color()
+        navigationOptions: ({ navigation }) => ({
+            headerForceInset: Platform.OS === "ios" ? {
+                top: 'never',
+                bottom: 'never'
+            } : {},
+            headerTitle: <CustomHeader navigate={navigation} HeaderTitle={"Map"} />,
+            headerStyle: {
+                backgroundColor: dynamic_side_drawer_header_color()
             },
-        }
+        })
     }
 })
 const MemoStack = createStackNavigator({
@@ -62,29 +75,37 @@ const MemoStack = createStackNavigator({
                 top: 'never',
                 bottom: 'never'
             } : {},
-            headerTitle: <MemoHeader navigate={navigation} /> ,
-            headerStyle : {
-                backgroundColor : dynamic_side_drawer_header_color()
+            headerTitle: <MemoHeader navigate={navigation} HeaderTitle={"Memo"} />,
+            headerStyle: {
+                backgroundColor: dynamic_side_drawer_header_color()
             },
         })
     },
     NewMemo: {
         screen: NewMemoScreen,
-        navigationOptions: {
-            title: 'New Memo' , 
-            headerStyle : {
-                backgroundColor : dynamic_side_drawer_header_color()
+        navigationOptions: ({ navigation }) => ({
+            headerForceInset: Platform.OS === "ios" ? {
+                top: 'never',
+                bottom: 'never'
+            } : {},
+            headerTitle: <CustomInnerHeader navigate={navigation} HeaderTitle={"New Memo"} />,
+            headerStyle: {
+                backgroundColor: dynamic_side_drawer_header_color()
             },
-        }
+        })
     },
     EditMemo: {
         screen: MemoScreenEdit,
-        navigationOptions: {
-            title: 'Edit' , 
-            headerStyle : {
-                backgroundColor : dynamic_side_drawer_header_color()
+        navigationOptions: ({ navigation }) => ({
+            headerForceInset: Platform.OS === "ios" ? {
+                top: 'never',
+                bottom: 'never'
+            } : {},
+            headerTitle: <CustomInnerHeader navigate={navigation} HeaderTitle={"Edit Memo"} />,
+            headerStyle: {
+                backgroundColor: dynamic_side_drawer_header_color()
             },
-        }
+        })
     }
 })
 const GalleryStack = createStackNavigator({
@@ -95,9 +116,9 @@ const GalleryStack = createStackNavigator({
                 top: 'never',
                 bottom: 'never'
             } : {},
-            headerTitle: <GalleryHeader navigate={navigation} /> , 
-            headerStyle : {
-                backgroundColor : dynamic_side_drawer_header_color()
+            headerTitle: <GalleryHeader navigate={navigation} />,
+            headerStyle: {
+                backgroundColor: dynamic_side_drawer_header_color()
             },
         })
     }
@@ -105,12 +126,16 @@ const GalleryStack = createStackNavigator({
 const SettingStack = createStackNavigator({
     Setting: {
         screen: SettingScreen,
-        navigationOptions: {
-            title: 'Setting' , 
-            headerStyle : {
-                backgroundColor : dynamic_side_drawer_header_color()
+        navigationOptions: ({ navigation }) => ({
+            headerForceInset: Platform.OS === "ios" ? {
+                top: 'never',
+                bottom: 'never'
+            } : {},
+            headerTitle: <CustomHeader navigate={navigation} HeaderTitle={"Setting"} />,
+            headerStyle: {
+                backgroundColor: dynamic_side_drawer_header_color()
             },
-        }
+        })
     }
 });
 const MainDrawerNavigator = createDrawerNavigator({
@@ -129,8 +154,8 @@ const MainDrawerNavigator = createDrawerNavigator({
     Setting: {
         screen: SettingStack
     },
-    Profile : {
-        screen : ProfileStack
+    Profile: {
+        screen: ProfileStack
     }
 },
     {

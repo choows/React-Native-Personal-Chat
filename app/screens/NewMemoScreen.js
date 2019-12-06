@@ -5,7 +5,9 @@ import { MemoColor } from '../constants/ColorCode';
 import { ColorPicker, TriangleColorPicker, fromHsv } from 'react-native-color-picker'
 import firebase from 'react-native-firebase';
 import { MEMO_URL } from '../constants/url';
+import { Button } from 'react-native-elements';
 import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynamic_main_background_color, dynamic_side_drawer_item_background } from '../theme/DynamicStyles';
+import { EventRegister } from 'react-native-event-listeners';
 class Color extends React.Component {
     render() {
         return (
@@ -13,7 +15,7 @@ class Color extends React.Component {
                 <TouchableOpacity
                     onLongPress={this.props.onlongpress}
                     onPress={() => { this.props.onpress(this.props.colorcode) }}
-                    style={{ backgroundColor: this.props.colorcode, borderRadius: 300, width: 20, height: 20, marginRight: 10, borderWidth: 1, borderColor: 'black' }}>
+                    style={{ backgroundColor: this.props.colorcode, borderRadius: 300, width: 25, height: 25, marginRight: 10, borderWidth: 1, borderColor: 'black' }}>
                     <View>
                         <Text></Text>
                     </View>
@@ -72,26 +74,31 @@ export default class NewMemoScreen extends React.Component {
         this.setState({ color_picker_visible: true });
     }
     SubmitNewMemo = () => {
-        const date_submit = new Date(this.state.from_date);
-        const yearmonth = date_submit.getFullYear().toString() + (date_submit.getMonth() + 1).toString();
-        const yearmonthday = this.DateDisplay(this.state.from_date);
-        //'2019-11-28': {dots: [{color: 'green'}, {color: 'red'}, {color: 'yellow'}]}
-        const arry_color = this.state.current_date_setted_color.split(',');
-        if (arry_color.includes(this.state.selected_color)) {
-            alert("Color Already In-Used.");
+        if (this.state.text_title !== "") {
+            const date_submit = new Date(this.state.from_date);
+            const yearmonth = date_submit.getFullYear().toString() + (date_submit.getMonth() + 1).toString();
+            const yearmonthday = this.DateDisplay(this.state.from_date);
+            //'2019-11-28': {dots: [{color: 'green'}, {color: 'red'}, {color: 'yellow'}]}
+            const arry_color = this.state.current_date_setted_color.split(',');
+            if (arry_color.includes(this.state.selected_color)) {
+                EventRegister.emit("Toast", "Color is been used.");
+            } else {
+                arry_color.push(this.state.selected_color);
+                const path = MEMO_URL + "Overall/" + yearmonth + "/" + yearmonthday;
+                firebase.database().ref(path).set({
+                    color: arry_color.toString(),
+                    YMD: yearmonthday
+                }).then(() => {
+                    this.SubmitMemoDetail();
+                    this.OnCancelNewMemo();
+                }).catch((err) => {
+                    console.log("Send Message Error : " + err);
+                });
+            }
         } else {
-            arry_color.push(this.state.selected_color);
-            const path = MEMO_URL + "Overall/" + yearmonth + "/" + yearmonthday;
-            firebase.database().ref(path).set({
-                color: arry_color.toString(),
-                YMD: yearmonthday
-            }).then(() => {
-                this.SubmitMemoDetail();
-                this.OnCancelNewMemo();
-            }).catch((err) => {
-                console.log("Send Message Error : " + err);
-            });
+            EventRegister.emit("Toast", "Title is Required To Submit New Memo");
         }
+
     }
     SubmitMemoDetail = () => {
         const date = new Date(this.state.from_date);
@@ -115,7 +122,7 @@ export default class NewMemoScreen extends React.Component {
                     visible={this.state.color_picker_visible}
                     onRequestClose={() => { this.setState({ color_picker_visible: false }) }}
                     transparent={false}>
-                    <View style={{ height: '100%', width: '100%' }}>
+                    <View style={{ height: '100%', width: '100%' , backgroundColor : dynamic_main_background_color() }}>
                         <TriangleColorPicker
                             onColorChange={(color) => { this.ColorPicked(fromHsv({ h: color.h, s: color.s, v: color.v })) }}
                             style={{ height: '80%', width: '100%' }}
@@ -137,7 +144,7 @@ export default class NewMemoScreen extends React.Component {
                             onChange={this.setFrom_date} />
                     }
                 </View>
-                <View style={{ flexDirection: 'row', height: '5%', width: '95%', alignContent: 'center', alignItems: 'center', margin: '2%' }}>
+                <View style={{ flexDirection: 'row', height: '10%', width: '95%', alignContent: 'center', alignItems: 'center', margin: '2%' }}>
                     <ScrollView horizontal={true} style={{ width: '90%' }}>
                         {
                             MemoColor.map((color) =>
@@ -149,8 +156,8 @@ export default class NewMemoScreen extends React.Component {
                         <View style={{
                             backgroundColor: this.state.selected_color,
                             borderRadius: 300,
-                            width: 20,
-                            height: 20,
+                            width: 30,
+                            height: 30,
                             marginRight: 10,
                             borderWidth: 2,
                             borderColor: 'black',
@@ -163,25 +170,33 @@ export default class NewMemoScreen extends React.Component {
                 </View>
                 <View style={{ flexDirection: 'row', minHeight: '10%', width: '95%', alignContent: 'center', alignItems: 'center', margin: '2%' }}>
                     <Text style={{ width: '20%', fontSize: 25 }}>Title :   </Text>
-                    <TextInput 
-                    multiline={false} 
-                    autoCorrect={true} 
-                    editable={true} 
-                    value={this.state.text_title} 
-                    onChangeText={(text) => { this.setState({ text_title: text }) }} 
-                    style={{width : '80%' ,borderWidth : 0.3, maxHeight : 40 , fontSize : 20 , fontWeight : 'bold'}}/>
+                    <TextInput
+                        multiline={false}
+                        autoCorrect={true}
+                        editable={true}
+                        value={this.state.text_title}
+                        onChangeText={(text) => { this.setState({ text_title: text }) }}
+                        style={{ width: '80%', borderWidth: 0.3, maxHeight: 40, fontSize: 20, borderRadius: 200, textAlign: 'center' }} />
                 </View>
-                <View style={styles.SectionView}>
-                    <Text style={{ width: '20%', fontSize: 25 }}>Detail :   </Text>
-                    <TextInput multiline={true} autoCorrect={true} editable={true} value={this.state.text_detail} onChangeText={(text) => { this.setState({ text_detail: text }) }} />
+                <View style={{ flexDirection: 'row', minHeight: '10%', width: '95%', alignContent: 'center', alignItems: 'center', margin: '2%', borderWidth: 0.2, borderRadius: 10 }}>
+                    <TextInput
+                        multiline={true}
+                        autoCorrect={true}
+                        editable={true}
+                        value={this.state.text_detail}
+                        onChangeText={(text) => { this.setState({ text_detail: text }) }} style={styles.MemoDetail} />
                 </View>
-                <View style={styles.SectionView}>
-                    <TouchableOpacity onPress={this.SubmitNewMemo}>
-                        <Text>Done</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={this.OnCancelNewMemo}>
-                        <Text>Cancel</Text>
-                    </TouchableOpacity>
+                <View style={styles.ButtonContainer}>
+                    <Button
+                        onPress={this.SubmitNewMemo}
+                        title="Done"
+                        containerStyle={styles.DoneButton}
+                    />
+                    <Button
+                        onPress={this.OnCancelNewMemo}
+                        title="Cancel"
+                        containerStyle={styles.CancelButton}
+                    />
                 </View>
             </View>
         )
@@ -211,5 +226,28 @@ const styles = StyleSheet.create({
         width: '20%',
         height: '100%',
         fontSize: 20
+    },
+    MemoDetail: {
+        width: '100%',
+        height: '100%'
+    },
+    DoneButton: {
+        width: '40%',
+        height: 100,
+        marginRight : 5
+    },
+    CancelButton : {
+        width : '40%',
+        height : 100,
+        marginLeft : 5
+    },
+    ButtonContainer : {
+        flexDirection: 'row', 
+        minHeight: '10%', 
+        width: '95%', 
+        alignContent: 'center', 
+        alignItems: 'center', 
+        margin: '2%' , 
+        justifyContent : 'center'
     }
 })

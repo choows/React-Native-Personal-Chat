@@ -9,8 +9,8 @@ export default themeStyles = new ThemeManager({
     },
     BlueTheme : {
         main_background_color : 'white',
-        header_background_color : '#69d2ff',
-        side_drawer_icon_color : '#6399ab',
-        side_drawer_item_background : '#99e0ff'
+        header_background_color : '#2b3fd6',
+        side_drawer_icon_color : '#1a2aa3',
+        side_drawer_item_background : '#9698eb'
     }
 });
