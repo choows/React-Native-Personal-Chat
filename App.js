@@ -5,23 +5,28 @@ import store from './app/redux/store';
 import SafeAreaView from 'react-native-safe-area-view';
 import AppNavigator from './app/navigation/MainNavigation';
 import themeStyles from './app/theme/ThemeManager';
+import * as settingAction from './app/redux/action/settings';
 export default class App extends React.Component {
   constructor() {
     super();
     this.state = {};
   }
 
-  async componentDidMount() { 
-    AsyncStorage.getItem("Theme" , (theme)=>{
-      if(theme !== null){
+  async componentDidMount() {
+    AsyncStorage.multiGet(['Theme' , 'FontSize']).then((result)=>{
+      //setup theme
+      const theme = result[0][1];
+      if (theme !== null) {
         themeStyles.setTheme(theme);
-      }else{
-        throw new Error("No Theme had setted.");
+      } else {
+        themeStyles.setTheme('PinkTheme');
       }
-      
-    }).catch((err)=>{
-      themeStyles.setTheme('PinkTheme');
-      console.log(err);
+
+      //setup font size 
+      const fontSize = result[1][1];
+      if (fontSize !== null) {
+        store.dispatch(settingAction.SetupFont_Size(fontSize));
+      }
     });
   }
 

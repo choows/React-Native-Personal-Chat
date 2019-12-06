@@ -145,7 +145,8 @@ export default class GalleryScreen extends React.Component {
                             infinite={true}
                             cardHorizontalMargin={0}
                             cardVerticalMargin={0}
-
+                            disableBottomSwipe={true}
+                            disableTopSwipe={true}
                         >
                         </Swiper>
                         :
