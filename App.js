@@ -6,6 +6,8 @@ import SafeAreaView from 'react-native-safe-area-view';
 import AppNavigator from './app/navigation/MainNavigation';
 import themeStyles from './app/theme/ThemeManager';
 import * as settingAction from './app/redux/action/settings';
+import Toast, {DURATION} from 'react-native-easy-toast'
+import { EventRegister } from 'react-native-event-listeners';
 export default class App extends React.Component {
   constructor() {
     super();
@@ -13,6 +15,9 @@ export default class App extends React.Component {
   }
 
   async componentDidMount() {
+    EventRegister.addEventListener('Toast' , (message)=>{
+      this.refs.toast.show(message , 1000);
+    })
     AsyncStorage.multiGet(['Theme' , 'FontSize']).then((result)=>{
       //setup theme
       const theme = result[0][1];
@@ -36,6 +41,7 @@ export default class App extends React.Component {
         <View>
           <SafeAreaView style={{ height: '100%', width: '100%' }}>
             <AppNavigator />
+            <Toast ref="toast"/>
           </SafeAreaView>
         </View>
       </Provider>

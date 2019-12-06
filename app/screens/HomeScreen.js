@@ -5,6 +5,7 @@ import store from '../redux/store';
 import { MESSAGE_URL } from '../constants/url';
 import { GetDearImageAndName } from '../util/UserSetup';
 import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynamic_main_background_color } from '../theme/DynamicStyles';
+import { EventRegister } from 'react-native-event-listeners';
 
 class MessageDetail extends React.Component {
     state = {
@@ -129,7 +130,7 @@ export default class HomeScreen extends React.Component {
         let one_week_ago = new Date();
         one_week_ago.setDate(one_week_ago.getDate() - 7);
         var to_milli = one_week_ago.getTime();
-
+        //EventRegister.emit('Toast' , "Hello Sample Toast Here");
         // firebase.database().ref(MESSAGE_URL).once('value', (snapshot) => {
         //     let temp_arr = [];
         //     if (snapshot.val()) {
