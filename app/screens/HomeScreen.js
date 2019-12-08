@@ -6,6 +6,8 @@ import { MESSAGE_URL } from '../constants/url';
 import { GetDearImageAndName } from '../util/UserSetup';
 import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynamic_main_background_color } from '../theme/DynamicStyles';
 import { EventRegister } from 'react-native-event-listeners';
+import ImagePicker from 'react-native-image-picker';
+import { Icon } from 'react-native-elements';
 class MessageDetail extends React.Component {
     state = {
         UserId: '',
@@ -23,42 +25,61 @@ class MessageDetail extends React.Component {
     */
 
     render() {
-        if (this.props.message_detail.message.SendBy === this.state.UserId) {
-            //self
-            return (
-                <View style={[styles.SelfTextContainer, styles.CommonTextContainer]}>
-                    <View style={[styles.SelfTextView, { backgroundColor: dynamic_side_drawer_icon_color() }]}>
-                        <View style={{ margin: 8 }}>
-                            <Text style={styles.ChatMessageText}>{this.props.message_detail.message.Detail}</Text>
-                        </View>
-                    </View>
-                </View>
-            )
-        } else {
-            // if (this.props.newLine === false) {
-            //     return (
-            //         <View style={{ width: '100%', justifyContent: 'flex-start', alignContent: 'flex-start', alignItems: 'flex-start' }}>
-            //             <Image source={{ uri: this.props.oppoImage }} style={styles.Chat_Message_Profile_Image} />
-            //             <View style={styles.OpoTextView}>
-            //                 <View style={{ margin: 8 }}>
-            //                     <Text style={styles.ChatMessageText}>{this.props.message_detail.message.Detail}</Text>
-            //                 </View>
-            //             </View>
-            //         </View>
-            //     )
 
-            // } else {
-                return (
-                    <View style={[styles.OpoTextContainer, styles.CommonTextContainer]}>
-                        <View style={styles.OpoTextView}>
-                            <View style={{ margin: 8 }}>
-                                <Text style={styles.ChatMessageText}>{this.props.message_detail.message.Detail}</Text>
+        switch (this.props.message_detail.message.Type) {
+            case "text": {
+                if (this.props.message_detail.message.SendBy === this.state.UserId) {
+                    //self
+                    return (
+                        <View style={[styles.SelfTextContainer, styles.CommonTextContainer]}>
+                            <View style={[styles.SelfTextView, { backgroundColor: dynamic_side_drawer_icon_color() }]}>
+                                <View style={{ margin: 8 }}>
+                                    <Text style={styles.ChatMessageText}>{this.props.message_detail.message.Detail}</Text>
+                                </View>
                             </View>
                         </View>
-                    </View>
-                )
-            //}
+                    )
+                } else {
+                    return (
+                        <View style={[styles.OpoTextContainer, styles.CommonTextContainer]}>
+                            <View style={styles.OpoTextView}>
+                                <View style={{ margin: 8 }}>
+                                    <Text style={styles.ChatMessageText}>{this.props.message_detail.message.Detail}</Text>
+                                </View>
+                            </View>
+                        </View>
+                    )
+                }
+                break;
+            }
+            case 'image': {
+                if (this.props.message_detail.message.SendBy === this.state.UserId) {
+                    //self
+                    return (
+                        <View style={[styles.SelfTextContainer, styles.CommonTextContainer]}>
+                            <View style={[styles.SelfTextView, { backgroundColor: dynamic_side_drawer_icon_color() , borderTopLeftRadius : 0 , borderBottomLeftRadius : 0 , borderTopRightRadius : 0 }]}>
+                                <View>
+                                    <Image style={{height : 250 , width : 170}} source={{ uri: this.props.message_detail.message.Detail }} />
+                                </View>
+                            </View>
+                        </View>
+                    )
+                } else {
+                    return (
+                        <View style={[styles.OpoTextContainer, styles.CommonTextContainer]}>
+                            <View style={[styles.OpoTextView , {borderTopRightRadius : 0 , borderBottomLeftRadius : 0 , borderBottomRightRadius : 0 }]}>
+                                <View>
+                                    <Image style={{height : 250 , width : 170}} source={{ uri: this.props.message_detail.message.Detail }} />
+                                </View>
+                            </View>
+                        </View>
+                    )
+                }
+                break;
+            }
         }
+
+
     }
 }
 
@@ -173,6 +194,63 @@ export default class HomeScreen extends React.Component {
         })
 
     }
+    OnNewImageClicked = () => {
+        ImagePicker.showImagePicker({
+            title: 'Photo',
+            takePhotoButtonTitle: 'Take Photo',
+            chooseFromLibraryButtonTitle: 'Library',
+            cancelButtonTitle: 'Cancel',
+            mediaType: 'photo',
+            quality: 1,
+        }, (response) => {
+            if (!response.didCancel) {
+                this.UploadToFirebaseStorage(response.path);
+            }
+        })
+    }
+    UploadToFirebaseStorage = (path) => {
+        const currentDate = new Date().getTime();
+        let storage_path = currentDate.toString();
+        firebase.storage().ref(storage_path).putFile(path).then((response) => {
+            this.SendImage(response.downloadURL);
+            this.UploadToFirebaseDatabase(response.downloadURL, path);
+            console.log('Uploaded To Image');
+        }).catch((err) => {
+            console.log("Upload Error : " + err);
+        });
+    }
+
+    SendImage = (path) => {
+        console.log("In Send Image.");
+        const state = store.getState();
+        let date_nw = new Date().getTime();
+        let message_send = {
+            "Detail": path,
+            "Type": 'image',
+            "SendBy": state.users.accountId,
+            "DateTime": date_nw
+        }
+        firebase.database().ref(MESSAGE_URL + "/" + date_nw.toString()).set({
+            message: message_send
+        }).then(() => {
+            EventRegister.emit("Toast", "Image Sended");
+        }).catch((err) => {
+            console.log("Send Message Error : " + err);
+        });
+    }
+    UploadToFirebaseDatabase = (path, url) => {
+        const currentDate = new Date().getTime().toString();
+        firebase.database().ref(IMAGE_URL + "/" + currentDate).set({
+            path: path,
+            DateTime: currentDate,
+            url: url
+        }).then(() => {
+            EventRegister.emit("Toast", "Upload Image Successfully");
+        })
+            .catch((err) => {
+                console.log("Upload to Database Error : " + err);
+            });
+    }
     //scrollTo() used to scroll to latest news 
     render() {
         return (
@@ -194,12 +272,27 @@ export default class HomeScreen extends React.Component {
                         </View>
                     </ScrollView>
                     <View style={styles.senderContainer}>
-                        <View style={{ height: '100%', width: '80%', marginBottom: 5 }}>
+                        <View style={{ height: '100%', width: '60%', marginBottom: 5, alignItems: 'center', alignContent: 'center', justifyContent: 'center' }}>
                             <TextInput style={styles.textinput} value={this.state.message} onChangeText={(text) => { this.setState({ message: text }) }} />
                         </View>
-                        <TouchableOpacity onPress={this.sendMessage} style={{ width: '20%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-                            <Image source={require('../assets/arrow_icon.png')} style={{ width: 40, height: 40, resizeMode: 'contain', tintColor: dynamic_side_drawer_icon_color() }} />
-                        </TouchableOpacity>
+                        <View style={{ width: '40%', height: '100%', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+                            <Icon
+                                raised
+                                name='camera'
+                                type='font-awesome'
+                                color={dynamic_side_drawer_icon_color()}
+                                onPress={this.OnNewImageClicked}
+                                style={{ width: 25, height: 25, marginRight: 5 }}
+                            />
+                            <Icon
+                                raised
+                                name='arrow-right'
+                                type='font-awesome'
+                                color={dynamic_side_drawer_icon_color()}
+                                onPress={this.sendMessage}
+                                style={{ width: 25, height: 25 }}
+                            />
+                        </View>
                     </View>
 
                 </View>
@@ -221,18 +314,19 @@ const styles = StyleSheet.create({
     },
     senderContainer: {
         width: '100%',
-        height: '6%',
+        height: '8%',
         flexDirection: 'row',
         marginBottom: '1%'
     },
     textinput: {
         width: '100%',
-        height: 40,
+        height: 35,
         borderColor: 'black',
         borderWidth: 0.3,
         borderRadius: 50,
-        marginBottom: 10,
-        marginLeft: 3
+        marginLeft: 8,
+        paddingVertical: 5,
+        paddingLeft: 10
     },
     SenderButton: {
         justifyContent: 'center',

@@ -167,12 +167,12 @@ class SideMenu extends Component {
                                 </View>
                             </TouchableOpacity>
                             <Seperator />
-                            <View style={{ height: 250, width: '100%', alignItems: 'center', borderWidth: 0.4 }}>
-                                <Text style={{ fontWeight: 'bold', fontSize: 15 }}>Reminder Today</Text>
+                            <View style={{ height: 250, width: '100%', alignItems: 'center' }}>
+                                <Text style={{ fontWeight: 'bold', fontSize: 15 }}>REMINDER</Text>
                                 <View><Text> </Text></View>
                                 {
                                     this.state.Memos.length <= 0 ?
-                                        <Text>No Reminder Today</Text>
+                                        <Text>No reminder for today</Text>
                                         :
                                         <ScrollView style={{ width: '100%' }}>
                                             {
