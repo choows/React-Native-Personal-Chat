@@ -6,13 +6,11 @@ import { MESSAGE_URL } from '../constants/url';
 import { GetDearImageAndName } from '../util/UserSetup';
 import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynamic_main_background_color } from '../theme/DynamicStyles';
 import { EventRegister } from 'react-native-event-listeners';
-import {SendMessage} from '../util/FirebaseCloudMessage';
 class MessageDetail extends React.Component {
     state = {
         UserId: '',
     }
     componentDidMount() {
-        SendMessage("Hi" , "Body");
         const state = store.getState();
         this.setState({ UserId: state.users.accountId });
         //console.log(state.users.accountId);
@@ -29,7 +27,7 @@ class MessageDetail extends React.Component {
             //self
             return (
                 <View style={[styles.SelfTextContainer, styles.CommonTextContainer]}>
-                    <View style={[styles.SelfTextView , {backgroundColor: dynamic_side_drawer_icon_color()}]}>
+                    <View style={[styles.SelfTextView, { backgroundColor: dynamic_side_drawer_icon_color() }]}>
                         <View style={{ margin: 8 }}>
                             <Text style={styles.ChatMessageText}>{this.props.message_detail.message.Detail}</Text>
                         </View>
@@ -37,19 +35,19 @@ class MessageDetail extends React.Component {
                 </View>
             )
         } else {
-            if (this.props.newLine === false) {
-                return (
-                    <View style={{ width: '100%', justifyContent: 'flex-start', alignContent: 'flex-start', alignItems: 'flex-start' }}>
-                        <Image source={{ uri: this.props.oppoImage }} style={styles.Chat_Message_Profile_Image} />
-                        <View style={styles.OpoTextView}>
-                            <View style={{ margin: 8 }}>
-                                <Text style={styles.ChatMessageText}>{this.props.message_detail.message.Detail}</Text>
-                            </View>
-                        </View>
-                    </View>
-                )
+            // if (this.props.newLine === false) {
+            //     return (
+            //         <View style={{ width: '100%', justifyContent: 'flex-start', alignContent: 'flex-start', alignItems: 'flex-start' }}>
+            //             <Image source={{ uri: this.props.oppoImage }} style={styles.Chat_Message_Profile_Image} />
+            //             <View style={styles.OpoTextView}>
+            //                 <View style={{ margin: 8 }}>
+            //                     <Text style={styles.ChatMessageText}>{this.props.message_detail.message.Detail}</Text>
+            //                 </View>
+            //             </View>
+            //         </View>
+            //     )
 
-            } else {
+            // } else {
                 return (
                     <View style={[styles.OpoTextContainer, styles.CommonTextContainer]}>
                         <View style={styles.OpoTextView}>
@@ -59,7 +57,7 @@ class MessageDetail extends React.Component {
                         </View>
                     </View>
                 )
-            }
+            //}
         }
     }
 }
@@ -115,17 +113,30 @@ export default class HomeScreen extends React.Component {
     SetToInitialState = () => {
         this.setState({ chat_message: [], oppoImage: '', oppoDisplay_Name: '' });
     }
-    checker = '';
+    /**
+     * when last line is self , then his line is oppo then return true 
+     * */
+    checker = store.getState().users.accountId;
     CheckNewLine = (UID) => {
-        if (this.checker !== UID) {
-            this.checker = UID;
-            return true;
-        } else {
-            this.checker = '';
-            return false;
-        }
+        // const state = store.getState();
+        // const currentUserID = state.users.accountId;
+        // if (this.checker === currentUserID && UID !== currentUserID) {
+        //     this.checker = UID;
+        //     console.log("True : " + this.checker + "    " + UID);
+        //     return true;
+        // } else {
+        //     if (this.checker !== UID) {
+        //         this.checker = UID;
+        //     }
+        //     this.checker = UID;
+        //     console.log("False : " + this.checker + "    " + UID);
+
+        //     return false
+        // }
+        return false;
     }
     componentDidMount() {
+        firebase.messaging().subscribeToTopic("ChooAndLeow");
         this.SetToInitialState();
         this.SetUpOppoDetails();
         let one_week_ago = new Date();
@@ -183,7 +194,7 @@ export default class HomeScreen extends React.Component {
                         </View>
                     </ScrollView>
                     <View style={styles.senderContainer}>
-                        <View style={{height : '100%' , width : '80%' , marginBottom : 5}}>
+                        <View style={{ height: '100%', width: '80%', marginBottom: 5 }}>
                             <TextInput style={styles.textinput} value={this.state.message} onChangeText={(text) => { this.setState({ message: text }) }} />
                         </View>
                         <TouchableOpacity onPress={this.sendMessage} style={{ width: '20%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>

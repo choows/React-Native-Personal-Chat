@@ -6,18 +6,29 @@ import SafeAreaView from 'react-native-safe-area-view';
 import AppNavigator from './app/navigation/MainNavigation';
 import themeStyles from './app/theme/ThemeManager';
 import * as settingAction from './app/redux/action/settings';
-import Toast, {DURATION} from 'react-native-easy-toast'
+import Toast, { DURATION } from 'react-native-easy-toast'
 import { EventRegister } from 'react-native-event-listeners';
+import firebase from 'react-native-firebase';
 export default class App extends React.Component {
   constructor() {
     super();
     this.state = {};
   }
+  OnFirebaseCloudMessageReceive = () => {
+    this.MessageListener = firebase.messaging().onMessage((message) => {
+      console.log("Cloud Message");
+      console.log(message);
+    });
+    this.removeNotificationListener = firebase.notifications().onNotification((notification) => {
+      this.refs.toast.show(notification.body, 1000);
+    });
+  }
   async componentDidMount() {
-    EventRegister.addEventListener('Toast' , (message)=>{
-      this.refs.toast.show(message , 1000);
+    this.OnFirebaseCloudMessageReceive();
+    EventRegister.addEventListener('Toast', (message) => {
+      this.refs.toast.show(message, 1000);
     })
-    AsyncStorage.multiGet(['Theme' , 'FontSize']).then((result)=>{
+    AsyncStorage.multiGet(['Theme', 'FontSize']).then((result) => {
       //setup theme
       const theme = result[0][1];
       if (theme !== null) {
@@ -40,7 +51,7 @@ export default class App extends React.Component {
         <View>
           <SafeAreaView style={{ height: '100%', width: '100%' }}>
             <AppNavigator />
-            <Toast ref="toast"/>
+            <Toast ref="toast" />
           </SafeAreaView>
         </View>
       </Provider>

@@ -2,9 +2,11 @@ import {
     USER_SETUP,
     CONVO_SETUP,
     USER_LOG_OUT,
-    USER_IMAGE_SETUP
+    USER_IMAGE_SETUP,
+    USER_PUSH_TOKEN_SETUP
 
 } from './types';
+
 export const Setup =(accid , display_n , email , imageUrl)=>{
     return {type : USER_SETUP , AccountId : accid , DisplayName : display_n , Email : email , Url : imageUrl}
 }
