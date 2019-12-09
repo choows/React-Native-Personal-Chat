@@ -12,5 +12,11 @@ export default themeStyles = new ThemeManager({
         header_background_color : '#2b3fd6',
         side_drawer_icon_color : '#3e58b0',
         side_drawer_item_background : '#9698eb'
+    },
+    GreyTheme : {
+        main_background_color : 'white',
+        header_background_color : '#b0acad',
+        side_drawer_icon_color : '#403e3f',
+        side_drawer_item_background : '#c9c3c6'
     }
 });

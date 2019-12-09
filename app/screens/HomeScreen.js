@@ -4,7 +4,7 @@ import firebase from 'react-native-firebase';
 import store from '../redux/store';
 import { MESSAGE_URL } from '../constants/url';
 import { GetDearImageAndName } from '../util/UserSetup';
-import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynamic_main_background_color } from '../theme/DynamicStyles';
+import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynamic_main_background_color, dynamic_side_drawer_item_background } from '../theme/DynamicStyles';
 import { EventRegister } from 'react-native-event-listeners';
 import ImagePicker from 'react-native-image-picker';
 import { Icon } from 'react-native-elements';
@@ -32,7 +32,7 @@ class MessageDetail extends React.Component {
                     //self
                     return (
                         <View style={[styles.SelfTextContainer, styles.CommonTextContainer]}>
-                            <View style={[styles.SelfTextView, { backgroundColor: dynamic_side_drawer_icon_color() }]}>
+                            <View style={[styles.SelfTextView, { backgroundColor: dynamic_side_drawer_item_background() }]}>
                                 <View style={{ margin: 8 }}>
                                     <Text style={styles.ChatMessageText}>{this.props.message_detail.message.Detail}</Text>
                                 </View>
@@ -57,7 +57,7 @@ class MessageDetail extends React.Component {
                     //self
                     return (
                         <View style={[styles.SelfTextContainer, styles.CommonTextContainer]}>
-                            <View style={[styles.SelfTextView, { backgroundColor: dynamic_side_drawer_icon_color() , borderTopLeftRadius : 0 , borderBottomLeftRadius : 0 , borderTopRightRadius : 0 }]}>
+                            <View style={[styles.SelfTextView, { backgroundColor: dynamic_side_drawer_item_background() , borderTopLeftRadius : 0 , borderBottomLeftRadius : 0 , borderTopRightRadius : 0 }]}>
                                 <View>
                                     <Image style={{height : 250 , width : 170}} source={{ uri: this.props.message_detail.message.Detail }} />
                                 </View>

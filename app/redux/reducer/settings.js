@@ -4,7 +4,7 @@ import {
 import { FontSizeNumber } from '../../constants/Themes';
 const initialState =
 {
-    font_size: FontSizeNumber[0]
+    font_size: 18
 }
 
 export default (state = initialState, action) => {
