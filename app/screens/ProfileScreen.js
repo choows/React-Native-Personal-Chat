@@ -60,43 +60,55 @@ export default class ProfileScreen extends React.Component {
             console.log("Update Error : " + err);
         });
     }
+    getUserID = () => {
+        const state = store.getState();
+        const Email = state.users.Email;
+        const UserID = Email.split('@')[0];
+        return '@' + UserID;
+    }
+    Cancel=()=>{
+        this.props.navigation.navigate('Home');
+    }
     render() {
         return (
             <View style={styles.container}>
                 <ScrollView style={styles.container}>
-                    <View style={styles.ProfileEditButtonView}>
-                        {
-                            this.state.EditProfile ?
-                                <TouchableOpacity onPress={() => { this.setState({ EditProfile: !this.state.EditProfile }) }} style={{ backgroundColor: 'blue', borderRadius: 50, marginTop: 10, marginRight: 10 }}>
-                                    <Text style={{ marginHorizontal: 10, marginVertical: 1, color: 'white' }}>Cancel</Text>
-                                </TouchableOpacity>
-                                :
-                                null
-                        }
-                        <TouchableOpacity onPress={this.ProfileEdit} style={{ backgroundColor: 'blue', borderRadius: 50, marginTop: 10, marginRight: 10 }}>
-                            <Text style={{ marginHorizontal: 10, marginVertical: 1, color: 'white' }}>{this.state.EditProfile ? "Done" : "Edit"}</Text>
-                        </TouchableOpacity>
-
-                    </View>
-                    <View style={styles.ImageViewcontainer}>
-                        <TouchableOpacity onPress={this.state.EditProfile ? this.ShowImagePicker : null} style={styles.Image}>
-                            <Image source={{ uri: this.state.profile_image }} style={styles.Image} />
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.ProfileNamecontainer}>
-                        {
-                            this.state.EditProfile ?
-                                <TextInput value={this.state.display_name} onChangeText={(text) => { this.setState({ display_name: text }) }} multiline={false} style={{ borderWidth: 0.2, textAlign: 'center', borderRadius: 50, marginVertical: 2, marginHorizontal: 5 }} />
-                                :
-                                <Text>{this.state.display_name}</Text>
-                        }
-                    </View>
-                    <View style={{ flexDirection: 'row', width: '100%', height: '20%', borderWidth: 0.1 }}>
-                        <View style={{ width: '20%', borderWidth: 0.1 }}>
-                            <Text style={{ margin: 5 }}>Email</Text>
+                    <View style={[styles.container, { alignContent: 'center', alignItems: 'center' }]}>
+                        <View style={styles.ImageViewcontainer}>
+                            <TouchableOpacity onPress={this.state.EditProfile ? this.ShowImagePicker : null} style={styles.Image}>
+                                <Image source={{ uri: this.state.profile_image }} style={styles.Image} />
+                            </TouchableOpacity>
                         </View>
-                        <View style={{ width: '80%', borderWidth: 0.1 }}>
-                            <Text style={{ margin: 5 }}>{this.state.email}</Text>
+
+                        {/*Below is the details of users ::: */}
+                        <View style={styles.SegmentDetailOuterLayer}>
+                            <Text style={styles.SegmentTitle}>User Name</Text>
+                            <View style={styles.SegmentDetailInnerDetail}>
+                                <Text>{this.getUserID()}</Text>
+                            </View>
+                        </View>
+                        <View style={styles.SegmentDetailOuterLayer}>
+                            <Text style={styles.SegmentTitle}>Display Name</Text>
+                            <View style={[styles.SegmentDetailInnerDetail , {height : 40}]}>
+                                <TextInput value={this.state.display_name} onChangeText={(text) => { this.setState({ display_name: text }) }} multiline={false} style={{ borderWidth: 0, width : '100%', color : 'black', padding : 0 }} />
+                            </View>
+                        </View>
+                        <View style={styles.SegmentDetailOuterLayer}>
+                            <Text style={styles.SegmentTitle}>Email</Text>
+                            <View style={styles.SegmentDetailInnerDetail}>
+                                <Text>{this.state.email}</Text>
+                            </View>
+                        </View>
+                        <View style={[styles.SegmentDetailOuterLayer , { flexDirection : 'row', alignItems : 'center' , alignContent : 'center', marginTop : '15%'}]}>
+                            <TouchableOpacity style={{height : 50 , width : '40%' ,justifyContent : 'center' , borderWidth : 0.2 , borderRadius : 10 , alignContent : 'center' , alignItems : 'center' , backgroundColor : '#3ded37'}} onPress={this.UpdateProfile}> 
+                                <Text style={{fontWeight : 'bold'}}>SAVE</Text>
+                            </TouchableOpacity>
+                            <View style={{width : '20%'}}>
+                                <Text></Text>
+                            </View>
+                            <TouchableOpacity style={{height : 50 , width : '40%' , justifyContent : 'center' , borderWidth : 0.2 , borderRadius : 10, alignContent : 'center' , alignItems : 'center'}} onPress={this.Cancel}>
+                                <Text style={{fontWeight : 'bold'}}>CANCEL</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </ScrollView>
@@ -109,7 +121,8 @@ export default class ProfileScreen extends React.Component {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        height: '100%'
+        height: '100%',
+        backgroundColor: '#d6d9d0'
     },
     ImageViewcontainer: {
         height: 100,
@@ -137,5 +150,22 @@ const styles = StyleSheet.create({
     },
     ProfileEditButtonView: {
         flexDirection: 'row-reverse'
+    },
+    SegmentDetailOuterLayer: {
+        width: '90%',
+    },
+    SegmentTitle: {
+        fontSize: 14,
+        color: '#9c9a97'
+    },
+    SegmentDetailInnerDetail: {
+        width: '100%',
+        height: 30,
+        borderRadius: 7,
+        borderWidth: 0.2,
+        backgroundColor: 'white',
+        justifyContent: 'center',
+        textAlign: 'right',
+        padding: 5
     }
 })
