@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
         height: '100%',
         alignItems : 'center',
         alignContent : 'center',
-        backgroundColor: dynamic_side_drawer_item_background()
+        backgroundColor: dynamic_main_background_color()
     },
     SectionView: {
         width: '98%',
