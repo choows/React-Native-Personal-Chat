@@ -205,7 +205,7 @@ export default class MemoScreen extends React.Component {
                             // Handler which gets executed on day press. Default = undefined
                             onDayPress={this.onDayPressed}
                             // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
-                            monthFormat={'yyyy MM'}
+                            monthFormat={'MMM yyyy'}
                             // Handler which gets executed when visible month changes in calendar. Default = undefined
                             onMonthChange={this.onMonthChange}
                             // Do not show days of other months in month page. Default = false
@@ -214,11 +214,11 @@ export default class MemoScreen extends React.Component {
                             // day from another month that is visible in calendar page. Default = false
                             disableMonthChange={false}
                             // If firstDay=1 week starts from Monday. Note that dayNames and dayNamesShort should still start from Sunday.
-                            firstDay={1}
+                            firstDay={7}
                             // Hide day names. Default = false
                             hideDayNames={false}
                             // Show week numbers to the left. Default = false
-                            showWeekNumbers={true}
+                            showWeekNumbers={false}
                             // Handler which gets executed when press arrow icon left. It receive a callback can go back month
                             onPressArrowLeft={substractMonth => substractMonth()}
                             // Handler which gets executed when press arrow icon left. It receive a callback can go next month

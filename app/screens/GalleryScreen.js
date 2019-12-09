@@ -10,7 +10,7 @@ import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynam
 class Card extends React.Component {
     render() {
         return (
-            <TouchableOpacity style={styles.CardView} onPress={()=>{this.props.OnImagePressed(this.props.UploadDate)}}>
+            <TouchableOpacity style={styles.CardView} onPress={() => { this.props.OnImagePressed(this.props.UploadDate) }}>
                 <Image source={{ uri: this.props.path }} style={styles.Image} />
             </TouchableOpacity>
         )
@@ -19,7 +19,9 @@ class Card extends React.Component {
 //https://github.com/alexbrillant/react-native-deck-swiper/blob/master/Example/App.js
 export default class GalleryScreen extends React.Component {
     state = {
-        cards: []
+        cards: [],
+        currentIndex: 0,
+        totalIndex: 0
     }
     componentDidMount = () => {
         EventRegister.addEventListener("AddNewImage", () => {
@@ -61,7 +63,7 @@ export default class GalleryScreen extends React.Component {
                 this.state.cards.unshift({
                     Date: result["DateTime"],
                     path: result["path"],
-                    url : result["url"]
+                    url: result["url"]
                 });
                 this.setState({ cards: this.state.cards });
             }
@@ -79,7 +81,7 @@ export default class GalleryScreen extends React.Component {
                 this.state.cards.unshift({
                     Date: result["DateTime"],
                     path: result["path"],
-                    url : result['url']
+                    url: result['url']
                 });
                 this.setState({ cards: this.state.cards });
             }
@@ -95,24 +97,24 @@ export default class GalleryScreen extends React.Component {
         const currentDate = new Date().getTime();
         let storage_path = currentDate.toString();
         firebase.storage().ref(storage_path).putFile(path).then((response) => {
-            this.UploadToFirebaseDatabase(response.downloadURL , path);
+            this.UploadToFirebaseDatabase(response.downloadURL, path);
         }).catch((err) => {
             console.log("Upload Error : " + err);
         });
     }
 
-    UploadToFirebaseDatabase = (path , url) => {
+    UploadToFirebaseDatabase = (path, url) => {
         const currentDate = new Date().getTime().toString();
         firebase.database().ref(IMAGE_URL + "/" + currentDate).set({
             path: path,
             DateTime: currentDate,
-            url : url
-        }).then(()=>{
-            EventRegister.emit("Toast" , "Upload Image Successfully");
+            url: url
+        }).then(() => {
+            EventRegister.emit("Toast", "Upload Image Successfully");
         })
-        .catch((err) => {
-            console.log("Upload to Database Error : " + err);
-        });
+            .catch((err) => {
+                console.log("Upload to Database Error : " + err);
+            });
     }
     GoToPrevious = () => {
         this.swiper.swipeBack();
@@ -123,10 +125,13 @@ export default class GalleryScreen extends React.Component {
     GoToFirst = () => {
         this.swiper.jumpToCardIndex(0);
     }
-    OnImagePress=(TimeStamp)=>{
+    OnImagePress = (TimeStamp) => {
         console.log(TimeStamp);
     }
-
+    OnCardSwiped=(details)=>{
+        this.setState({currentIndex : details +1});
+        console.log(details);
+    }
     render() {
         return (
             <View style={styles.Container}>
@@ -139,10 +144,11 @@ export default class GalleryScreen extends React.Component {
                             cards={this.state.cards}
                             renderCard={(card) => {
                                 return (
-                                    <Card path={card.path} UploadDate={card.Date} key={card.Date} OnImagePressed={this.OnImagePress}/>
+                                    <Card path={card.path} UploadDate={card.Date} key={card.Date} OnImagePressed={this.OnImagePress} />
                                 )
                             }}
                             cardIndex={0}
+                            onSwiped={this.OnCardSwiped}
                             onSwipedLeft={() => { this.GoToPrevious }}
                             goBackToPreviousCardOnSwipeRight={true}
                             stackSize={3}
@@ -151,9 +157,13 @@ export default class GalleryScreen extends React.Component {
                             infinite={true}
                             cardHorizontalMargin={0}
                             cardVerticalMargin={0}
-                            disableBottomSwipe={true}
-                            disableTopSwipe={true}
+                            verticalSwipe={false}
                         >
+                            <View style={{ height: '100%', width: '100%', flexDirection: 'column-reverse' }}>
+                                <View style={{ height: '5%', width: '100%', justifyContent : 'center' , alignContent : "center" , alignItems : 'center'}}>
+                                    <Text style={{fontSize : 18}}>{this.state.currentIndex + " / " + this.state.cards.length}</Text>
+                                </View>
+                            </View>
                         </Swiper>
                         :
                         <View></View>
@@ -210,9 +220,9 @@ const styles = StyleSheet.create({
         width: '100%',
         resizeMode: 'stretch'
     },
-    DateDisplay : {
-        height : '100%',
-        width : '100%',
-        textAlign : 'justify',
+    DateDisplay: {
+        height: '100%',
+        width: '100%',
+        textAlign: 'justify',
     }
 })

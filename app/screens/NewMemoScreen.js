@@ -73,6 +73,16 @@ export default class NewMemoScreen extends React.Component {
     OnColorLongPress = () => {
         this.setState({ color_picker_visible: true });
     }
+    GetMonthString = (month) => {
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+        return monthNames[month];
+    }
+    DisplayDateFormat = (timestamp) => {
+        const date = new Date(timestamp);
+        return date.getDate() + " " + this.GetMonthString(date.getMonth()) + " " + date.getFullYear();
+    }
     SubmitNewMemo = () => {
         if (this.state.text_title !== "") {
             const date_submit = new Date(this.state.from_date);
@@ -122,7 +132,7 @@ export default class NewMemoScreen extends React.Component {
                     visible={this.state.color_picker_visible}
                     onRequestClose={() => { this.setState({ color_picker_visible: false }) }}
                     transparent={false}>
-                    <View style={{ height: '100%', width: '100%' , backgroundColor : dynamic_main_background_color() }}>
+                    <View style={{ height: '100%', width: '100%', backgroundColor: dynamic_main_background_color() }}>
                         <TriangleColorPicker
                             onColorChange={(color) => { this.ColorPicked(fromHsv({ h: color.h, s: color.s, v: color.v })) }}
                             style={{ height: '80%', width: '100%' }}
@@ -133,7 +143,7 @@ export default class NewMemoScreen extends React.Component {
                 <View style={{ flexDirection: 'row', height: '10%', width: '95%', alignContent: 'center', alignItems: 'center', margin: '2%' }}>
                     <Text style={{ width: '20%', fontSize: 25 }}>Date : </Text>
                     <TouchableOpacity style={{ width: '80%', flexDirection: 'row-reverse' }} onPress={() => { this.setState({ display_from: true }) }}>
-                        <Text style={{ fontSize: 25 }}>{this.DateDisplay(this.state.from_date)}</Text>
+                        <Text style={{ fontSize: 20 }}>{this.DisplayDateFormat(this.state.from_date)}</Text>
                     </TouchableOpacity>
 
                     {
@@ -152,7 +162,7 @@ export default class NewMemoScreen extends React.Component {
                             )
                         }
                     </ScrollView>
-                    <View style={{ width: '10%' }}>
+                    <View style={{ width: '10%' , flexDirection : 'row-reverse' }}>
                         <View style={{
                             backgroundColor: this.state.selected_color,
                             borderRadius: 300,
@@ -207,6 +217,8 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         height: '100%',
+        alignItems : 'center',
+        alignContent : 'center',
         backgroundColor: dynamic_side_drawer_item_background()
     },
     SectionView: {
@@ -234,20 +246,20 @@ const styles = StyleSheet.create({
     DoneButton: {
         width: '40%',
         height: 100,
-        marginRight : 5
+        marginRight: 5
     },
-    CancelButton : {
-        width : '40%',
-        height : 100,
-        marginLeft : 5
+    CancelButton: {
+        width: '40%',
+        height: 100,
+        marginLeft: 5
     },
-    ButtonContainer : {
-        flexDirection: 'row', 
-        minHeight: '10%', 
-        width: '95%', 
-        alignContent: 'center', 
-        alignItems: 'center', 
-        margin: '2%' , 
-        justifyContent : 'center'
+    ButtonContainer: {
+        flexDirection: 'row',
+        minHeight: '10%',
+        width: '95%',
+        alignContent: 'center',
+        alignItems: 'center',
+        margin: '2%',
+        justifyContent: 'center'
     }
 })

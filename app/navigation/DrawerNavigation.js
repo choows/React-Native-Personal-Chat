@@ -36,30 +36,30 @@ class SideMenu extends Component {
     }
     GetCurrentDayMemo = () => {
         const date = new Date();
-        const correct_date = date.getDate() < 10 ? "0"+ date.getDate().toString() : date.getDate.toString();
+        const correct_date = date.getDate() < 10 ? "0" + date.getDate().toString() : date.getDate.toString();
         const dayString = date.getFullYear().toString() + "-" + (date.getMonth() + 1).toString() + "-" + correct_date;
         const path = MEMO_URL + "Detail/" + dayString + "/";
         this.GetMemoOnce(path, dayString);
-        this.GetMemoOn(path , dayString);
+        this.GetMemoOn(path, dayString);
     }
     NavigateToMemoDetail = (memo) => {
         //console.log("Memo Here");
-        
-        const path = MEMO_URL + "Detail/" + memo.date + "/" + memo.key ;
+
+        const path = MEMO_URL + "Detail/" + memo.date + "/" + memo.key;
 
         this.props.navigation.navigate('EditMemo', {
-            path : path,
-            color : memo.color,
-            text : memo.text,
-            title : memo.title,
-            date : memo.date
+            path: path,
+            color: memo.color,
+            text: memo.text,
+            title: memo.title,
+            date: memo.date
         });
     }
-    GetMemoOn =(path , yearmonthday)=>{
+    GetMemoOn = (path, yearmonthday) => {
         firebase.database().ref(path).on('child_added', (snapshot) => {
             if (snapshot.exists) {
                 if (snapshot.toJSON() !== null) {
-                    this.GetMemoOnce(path , yearmonthday);
+                    this.GetMemoOnce(path, yearmonthday);
                 }
             }
         })
@@ -94,6 +94,12 @@ class SideMenu extends Component {
             console.log("Logout Error : " + err);
         });
     }
+    getUserID = () => {
+        const state = store.getState();
+        const Email = state.users.Email;
+        const UserID = Email.split('@')[0];
+        return '@' + UserID;
+    }
     render() {
         const state = store.getState();
         return (
@@ -105,6 +111,7 @@ class SideMenu extends Component {
                                 <Image source={{ uri: state.users.ProfileImage }} style={cus_style.ProfileImage} />
                             </View>
                             <Text style={cus_style.DisplayNameStyle}>{state.users.displayName}</Text>
+                            <Text style={cus_style.EmailDisplay}>{this.getUserID()}</Text>
                         </TouchableOpacity>
                         <View style={{ backgroundColor: dynamic_main_background_color() }}>
                             <TouchableOpacity onPress={() => { this.navigateToScreen('Home') }} style={cus_style.NavigationSelectionView}>
@@ -168,7 +175,7 @@ class SideMenu extends Component {
                             </TouchableOpacity>
                             <Seperator />
                             <View style={{ height: 250, width: '100%', alignItems: 'center' }}>
-                                <Text style={{ fontWeight: 'bold', fontSize: 15 }}>REMINDER</Text>
+                                <Text style={{ fontWeight: 'bold', fontSize: 15, marginTop: 3 }}>REMINDER</Text>
                                 <View><Text> </Text></View>
                                 {
                                     this.state.Memos.length <= 0 ?
@@ -185,7 +192,7 @@ class SideMenu extends Component {
                                                                 color={dynamic_side_drawer_icon_color()}
                                                                 size={20}
                                                             />
-                                                            
+
                                                             <Text> {memo.title}</Text>
                                                         </View>
 
