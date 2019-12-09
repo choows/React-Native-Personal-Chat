@@ -38,8 +38,32 @@ export default class HomeScreen extends React.Component {
         return (
             <View style={styles.container}>
                 <View style={styles.TextInputView}>
-                    <Input leftIcon={{ type: 'font-awesome', name: 'envelope' }} onChangeText={text => this.setState({ username: text })} value={this.state.username} />
-                    <Input leftIcon={{ type: 'font-awesome', name: 'lock' }} onChangeText={text => this.setState({ password: text })} value={this.state.password} secureTextEntry={true} />
+                    <Input 
+                    leftIcon={
+                        <Icon
+                        name='envelope'
+                        size={20}
+                        type='font-awesome'/>
+                    } 
+                    onChangeText={text => this.setState({ username: text })} 
+                    leftIconContainerStyle={{width : 20}}
+                    value={this.state.username} 
+                    inputStyle={{marginLeft : '4%'}}
+                    placeholder={"Email@address.com"}/>
+
+                    <Input 
+                    leftIcon={
+                        <Icon
+                        name='lock'
+                        size={20}
+                        type='font-awesome'/>
+                    } 
+                    leftIconContainerStyle={{width : 20}}
+                    onChangeText={text => this.setState({ password: text })} 
+                    value={this.state.password} 
+                    secureTextEntry={true} 
+                    inputStyle={{marginLeft : '4%'}}
+                    placeholder={"Password"}/>
                 </View>
 
                 <TouchableOpacity style={styles.LoginButtonView} onPress={this.Login}>
@@ -69,7 +93,7 @@ const styles = StyleSheet.create({
     LoginButtonView: {
         alignItems: 'center',
         width: '75%',
-        height: '7%',
+        height: 40,
         marginTop: '5%',
         justifyContent: 'center',
         alignContent: 'center',

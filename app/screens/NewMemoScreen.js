@@ -137,6 +137,7 @@ export default class NewMemoScreen extends React.Component {
                             onColorChange={(color) => { this.ColorPicked(fromHsv({ h: color.h, s: color.s, v: color.v })) }}
                             style={{ height: '80%', width: '100%' }}
                             onColorSelected={() => { this.setState({ color_picker_visible: false }) }}
+                            hideSliders={true}
                         />
                     </View>
                 </Modal>
