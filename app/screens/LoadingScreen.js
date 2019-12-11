@@ -42,7 +42,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     ImageStyle : {
-        width : '100%',
-        height : '70%'
+        width : '90%',
+        height : '70%',
+        resizeMode : 'contain'
     }
 })
