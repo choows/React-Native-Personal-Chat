@@ -40,8 +40,9 @@ export default class ProfileScreen extends React.Component {
             displayName: this.state.display_name,
         }).then(() => {
             store.dispatch(useractions.Setup(state.users.accountId, this.state.display_name, state.users.Email, this.state.profile_image));
-            EventRegister.emit("Toast", "Update Profile Successfully");
+            EventRegister.emit("Toast", "Profile updated successfully");
         }).catch((err) => {
+            EventRegister.emit("Toast", "Profile updated failed");
             console.log("Error : " + err);
         });
     }
@@ -75,7 +76,7 @@ export default class ProfileScreen extends React.Component {
                 <ScrollView style={styles.container}>
                     <View style={[styles.container, { alignContent: 'center', alignItems: 'center' }]}>
                         <View style={styles.ImageViewcontainer}>
-                            <TouchableOpacity onPress={this.state.EditProfile ? this.ShowImagePicker : null} style={styles.Image}>
+                            <TouchableOpacity onPress={this.ShowImagePicker} style={styles.Image}>
                                 <Image source={{ uri: this.state.profile_image }} style={styles.Image} />
                             </TouchableOpacity>
                         </View>

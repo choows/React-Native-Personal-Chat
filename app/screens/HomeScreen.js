@@ -7,7 +7,7 @@ import { GetDearImageAndName } from '../util/UserSetup';
 import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynamic_main_background_color, dynamic_side_drawer_item_background } from '../theme/DynamicStyles';
 import { EventRegister } from 'react-native-event-listeners';
 import ImagePicker from 'react-native-image-picker';
-import { Icon } from 'react-native-elements';
+import { Icon, Overlay } from 'react-native-elements';
 class MessageDetail extends React.Component {
     state = {
         UserId: '',
@@ -57,21 +57,21 @@ class MessageDetail extends React.Component {
                     //self
                     return (
                         <View style={[styles.SelfTextContainer, styles.CommonTextContainer]}>
-                            <View style={[styles.SelfTextView, { backgroundColor: dynamic_side_drawer_item_background() , borderTopLeftRadius : 0 , borderBottomLeftRadius : 0 , borderTopRightRadius : 0 }]}>
+                            <TouchableOpacity onPress={() => { this.props.DisplayOverLay(this.props.message_detail.message.Detail) }} style={[styles.SelfTextView, { backgroundColor: dynamic_side_drawer_item_background(), borderTopLeftRadius: 0, borderBottomLeftRadius: 0, borderTopRightRadius: 0 }]}>
                                 <View>
-                                    <Image style={{height : 250 , width : 170}} source={{ uri: this.props.message_detail.message.Detail }} />
+                                    <Image style={{ height: 250, width: 170 }} source={{ uri: this.props.message_detail.message.Detail }} />
                                 </View>
-                            </View>
+                            </TouchableOpacity>
                         </View>
                     )
                 } else {
                     return (
                         <View style={[styles.OpoTextContainer, styles.CommonTextContainer]}>
-                            <View style={[styles.OpoTextView , {borderTopRightRadius : 0 , borderBottomLeftRadius : 0 , borderBottomRightRadius : 0 }]}>
+                            <TouchableOpacity onPress={() => { this.props.DisplayOverLay(this.props.message_detail.message.Detail) }} style={[styles.OpoTextView, { borderTopRightRadius: 0, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }]}>
                                 <View>
-                                    <Image style={{height : 250 , width : 170}} source={{ uri: this.props.message_detail.message.Detail }} />
+                                    <Image style={{ height: 250, width: 170 }} source={{ uri: this.props.message_detail.message.Detail }} />
                                 </View>
-                            </View>
+                            </TouchableOpacity>
                         </View>
                     )
                 }
@@ -91,7 +91,10 @@ export default class HomeScreen extends React.Component {
         startlisten: false,
         oppoImage: '',
         oppoDisplay_Name: '',
-        Message_UID: ''
+        Message_UID: '',
+        OverLay_Visible: false,
+        OverLay_Image_Path: '',
+        Timer : ''
     }
     sendMessage = () => {
         const state = store.getState();
@@ -111,7 +114,12 @@ export default class HomeScreen extends React.Component {
                 console.log("Send Message Error : " + err);
             });
         }
+    }
 
+    DisplayOverLay = (path) => {
+        this.setState({ OverLay_Image_Path: path }, () => {
+            this.setState({ OverLay_Visible: !this.state.OverLay_Visible });
+        })
     }
 
     SetUpOppoDetails = () => {
@@ -238,6 +246,39 @@ export default class HomeScreen extends React.Component {
             console.log("Send Message Error : " + err);
         });
     }
+    GetMonthString = (month) => {
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+        return monthNames[month];
+    }
+    time = "";
+    CheckTimer=(timeStamp)=>{
+        const NumtimeStamp = parseInt(timeStamp);
+
+        var currentDt =  this.time === "" ?  new Date() : new Date(this.time);
+        currentDt.setDate(currentDt.getDate()-1);
+        if(this.time === "" || NumtimeStamp < currentDt.getTime()){
+            //this.setState({Timer : NumtimeStamp});
+            this.time = NumtimeStamp;
+            const date = new Date(NumtimeStamp);
+            return(
+            <View style={{width : '100%' , alignContent : 'center' , alignItems : 'center'}}><Text>{this.GetMonthString(date.getMonth()) + " " + date.getDate()}</Text></View>
+            )
+        }
+        var currentDt2 =  this.time === "" ?  new Date() : new Date(this.time);
+        currentDt2.setUTCHours(currentDt2.getUTCHours() -1);
+        if(this.time === "" || NumtimeStamp < currentDt2.getTime()){
+            //this.setState({Timer : NumtimeStamp});
+            this.time = NumtimeStamp;
+            const date = new Date(NumtimeStamp);
+            return(
+            <View style={{width : '100%' , alignContent : 'center' , alignItems : 'center'}}><Text>{date.getHours() + ":" + date.getMinutes()}</Text></View>
+            )
+        }
+        this.time = NumtimeStamp;
+        return null;
+    }
     UploadToFirebaseDatabase = (path, url) => {
         const currentDate = new Date().getTime().toString();
         firebase.database().ref(IMAGE_URL + "/" + currentDate).set({
@@ -255,6 +296,11 @@ export default class HomeScreen extends React.Component {
     render() {
         return (
             <View style={styles.container}>
+                <Overlay isVisible={this.state.OverLay_Visible} onBackdropPress={() => this.setState({ OverLay_Visible: false })}>
+                    <TouchableOpacity onPress={() => { this.setState({ OverLay_Visible: !this.state.OverLay_Visible }) }} style={{ width: '100%', height: '100%' }}>
+                        <Image source={{ uri: this.state.OverLay_Image_Path }} style={{ height: '100%', width: '100%', resizeMode: 'contain' }} />
+                    </TouchableOpacity>
+                </Overlay>
                 <View style={styles.container}>
                     <ScrollView style={{ height: '93%', width: '100%' }}
                         ref={ref => this.scrollView = ref}
@@ -265,7 +311,10 @@ export default class HomeScreen extends React.Component {
                             {
                                 this.state.oppoImage !== '' && this.state.oppoDisplay_Name !== '' ?
                                     this.state.chat_message.map((message_detail) =>
-                                        <MessageDetail message_detail={message_detail} key={message_detail.message.DateTime} oppoImage={this.state.oppoImage} oppoName={this.state.oppoDisplay_Name} newLine={this.CheckNewLine(message_detail.message.SendBy)} />
+                                        <View key={message_detail.message.DateTime} >
+                                            {this.CheckTimer(message_detail.message.DateTime)}
+                                        <MessageDetail DisplayOverLay={this.DisplayOverLay} message_detail={message_detail}oppoImage={this.state.oppoImage} oppoName={this.state.oppoDisplay_Name} newLine={this.CheckNewLine(message_detail.message.SendBy)} />
+                                        </View>
                                     )
                                     : <View></View>
                             }
@@ -313,6 +362,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column-reverse'
     },
     senderContainer: {
+        marginLeft: '3%',
         width: '100%',
         height: '8%',
         flexDirection: 'row',
