@@ -21,7 +21,8 @@ export default class GalleryScreen extends React.Component {
     state = {
         cards: [],
         currentIndex: 0,
-        totalIndex: 0
+        totalIndex: 0,
+        visible : false
     }
     componentDidMount = () => {
         EventRegister.addEventListener("AddNewImage", () => {
@@ -65,7 +66,9 @@ export default class GalleryScreen extends React.Component {
                     path: result["path"],
                     url: result["url"]
                 });
-                this.setState({ cards: this.state.cards });
+                this.setState({ cards: this.state.cards , visible : false } , ()=>{
+                    this.setState({visible : true});
+                });
             }
         });
 
@@ -83,7 +86,9 @@ export default class GalleryScreen extends React.Component {
                     path: result["path"],
                     url: result['url']
                 });
-                this.setState({ cards: this.state.cards });
+                this.setState({ cards: this.state.cards , visible : false } , ()=>{
+                    this.setState({visible : true});
+                });
             }
 
             //console.log("Result : " + JSON.stringify(snapshot.toJSON()));
@@ -136,7 +141,7 @@ export default class GalleryScreen extends React.Component {
         return (
             <View style={styles.Container}>
                 <View style={styles.SwpView}>
-                    {this.state.cards.length > 0 ?
+                    {this.state.visible ?
                         <Swiper
                             ref={swiper => {
                                 this.swiper = swiper
