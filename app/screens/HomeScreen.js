@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Image, AsyncStorage } from 'react-native'
 import firebase from 'react-native-firebase';
 import store from '../redux/store';
-import { MESSAGE_URL ,TOKEN_URL} from '../constants/url';
+import { MESSAGE_URL, TOKEN_URL } from '../constants/url';
 import { GetDearImageAndName } from '../util/UserSetup';
 import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynamic_main_background_color, dynamic_side_drawer_item_background } from '../theme/DynamicStyles';
 import { EventRegister } from 'react-native-event-listeners';
@@ -20,12 +20,12 @@ class MessageDetail extends React.Component {
         this.setFirebasePushToken(state.users.accountId);
     }
 
-    setFirebasePushToken=(acc_id)=>{
-        firebase.messaging().getToken().then((token)=>{
-            firebase.database().ref(TOKEN_URL + acc_id + "/").set({token : token}).catch((err)=>{
+    setFirebasePushToken = (acc_id) => {
+        firebase.messaging().getToken().then((token) => {
+            firebase.database().ref(TOKEN_URL + acc_id + "/").set({ token: token }).catch((err) => {
                 console.log("Set Token Error : " + err);
             });
-        }).catch((err)=>{
+        }).catch((err) => {
             console.log("Get Token Error : " + err);
         });
     }
@@ -104,7 +104,7 @@ export default class HomeScreen extends React.Component {
         Message_UID: '',
         OverLay_Visible: false,
         OverLay_Image_Path: '',
-        Timer : ''
+        Timer: ''
     }
     sendMessage = () => {
         const state = store.getState();
@@ -174,8 +174,32 @@ export default class HomeScreen extends React.Component {
         // }
         return false;
     }
+    checkAnniversary = () => {
+        const currentDate = new Date();
+        if (currentDate.getDate() == 13) {
+            const ani_date = new Date("2019-05-13");
+            var difference = currentDate - ani_date;
+            var day = difference / (1000 * 60 * 60 * 24);
+            var fixed_day = parseInt(day.toFixed(0));
+            var year = 0;
+            var month = 0;
+            while (fixed_day > 365) {
+                year = year + 1;
+                fixed_day = fixed_day - 365;
+            }
+            while (fixed_day > 30) {
+                month = month + 1;
+                fixed_day = fixed_day - 30;
+            }
+            this.showAnniversary(year, month);
+        }
+
+    }
+    showAnniversary = (year, month) => {
+
+    }
     componentDidMount() {
-        firebase.messaging().subscribeToTopic("ChooAndLeow");
+        this.checkAnniversary();
         this.SetToInitialState();
         this.SetUpOppoDetails();
         let one_week_ago = new Date();
@@ -263,27 +287,27 @@ export default class HomeScreen extends React.Component {
         return monthNames[month];
     }
     time = "";
-    CheckTimer=(timeStamp)=>{
+    CheckTimer = (timeStamp) => {
         const NumtimeStamp = parseInt(timeStamp);
 
-        var currentDt =  this.time === "" ?  new Date() : new Date(this.time);
-        currentDt.setDate(currentDt.getDate()-1);
-        if(this.time === "" || NumtimeStamp < currentDt.getTime()){
+        var currentDt = this.time === "" ? new Date() : new Date(this.time);
+        currentDt.setDate(currentDt.getDate() - 1);
+        if (this.time === "" || NumtimeStamp < currentDt.getTime()) {
             //this.setState({Timer : NumtimeStamp});
             this.time = NumtimeStamp;
             const date = new Date(NumtimeStamp);
-            return(
-            <View style={{width : '100%' , alignContent : 'center' , alignItems : 'center', backgroundColor : dynamic_side_drawer_header_color()}}><Text>{this.GetMonthString(date.getMonth()) + " " + date.getDate()}</Text></View>
+            return (
+                <View style={{ width: '100%', alignContent: 'center', alignItems: 'center', backgroundColor: dynamic_side_drawer_header_color() }}><Text>{this.GetMonthString(date.getMonth()) + " " + date.getDate()}</Text></View>
             )
         }
-        var currentDt2 =  this.time === "" ?  new Date() : new Date(this.time);
-        currentDt2.setUTCHours(currentDt2.getUTCHours() -1);
-        if(this.time === "" || NumtimeStamp < currentDt2.getTime()){
+        var currentDt2 = this.time === "" ? new Date() : new Date(this.time);
+        currentDt2.setUTCHours(currentDt2.getUTCHours() - 1);
+        if (this.time === "" || NumtimeStamp < currentDt2.getTime()) {
             //this.setState({Timer : NumtimeStamp});
             this.time = NumtimeStamp;
             const date = new Date(NumtimeStamp);
-            return(
-            <View style={{width : '100%' , alignContent : 'center' , alignItems : 'center' , backgroundColor : dynamic_side_drawer_header_color()}}><Text>{date.getHours() + ":" + date.getMinutes()}</Text></View>
+            return (
+                <View style={{ width: '100%', alignContent: 'center', alignItems: 'center', backgroundColor: dynamic_side_drawer_header_color() }}><Text>{date.getHours() + ":" + date.getMinutes()}</Text></View>
             )
         }
         this.time = NumtimeStamp;
@@ -297,10 +321,9 @@ export default class HomeScreen extends React.Component {
             url: url
         }).then(() => {
             EventRegister.emit("Toast", "Upload Image Successfully");
-        })
-            .catch((err) => {
-                console.log("Upload to Database Error : " + err);
-            });
+        }).catch((err) => {
+            console.log("Upload to Database Error : " + err);
+        });
     }
     //scrollTo() used to scroll to latest news 
     render() {
@@ -323,7 +346,7 @@ export default class HomeScreen extends React.Component {
                                     this.state.chat_message.map((message_detail) =>
                                         <View key={message_detail.message.DateTime} >
                                             {this.CheckTimer(message_detail.message.DateTime)}
-                                        <MessageDetail DisplayOverLay={this.DisplayOverLay} message_detail={message_detail}oppoImage={this.state.oppoImage} oppoName={this.state.oppoDisplay_Name} newLine={this.CheckNewLine(message_detail.message.SendBy)} />
+                                            <MessageDetail DisplayOverLay={this.DisplayOverLay} message_detail={message_detail} oppoImage={this.state.oppoImage} oppoName={this.state.oppoDisplay_Name} newLine={this.CheckNewLine(message_detail.message.SendBy)} />
                                         </View>
                                     )
                                     : <View></View>
