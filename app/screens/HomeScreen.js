@@ -273,7 +273,7 @@ export default class HomeScreen extends React.Component {
             this.time = NumtimeStamp;
             const date = new Date(NumtimeStamp);
             return(
-            <View style={{width : '100%' , alignContent : 'center' , alignItems : 'center'}}><Text>{this.GetMonthString(date.getMonth()) + " " + date.getDate()}</Text></View>
+            <View style={{width : '100%' , alignContent : 'center' , alignItems : 'center', backgroundColor : dynamic_side_drawer_header_color()}}><Text>{this.GetMonthString(date.getMonth()) + " " + date.getDate()}</Text></View>
             )
         }
         var currentDt2 =  this.time === "" ?  new Date() : new Date(this.time);
@@ -283,7 +283,7 @@ export default class HomeScreen extends React.Component {
             this.time = NumtimeStamp;
             const date = new Date(NumtimeStamp);
             return(
-            <View style={{width : '100%' , alignContent : 'center' , alignItems : 'center'}}><Text>{date.getHours() + ":" + date.getMinutes()}</Text></View>
+            <View style={{width : '100%' , alignContent : 'center' , alignItems : 'center' , backgroundColor : dynamic_side_drawer_header_color()}}><Text>{date.getHours() + ":" + date.getMinutes()}</Text></View>
             )
         }
         this.time = NumtimeStamp;
@@ -413,19 +413,18 @@ const styles = StyleSheet.create({
         maxWidth: '60%',
         marginLeft: '5%',
         marginTop: 5,
-        borderWidth: 0.4,
-        borderBottomLeftRadius: 150,
-        borderBottomRightRadius: 150,
-        borderTopRightRadius: 150
+        borderWidth: 0.2,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+        borderTopRightRadius: 20
     },
     SelfTextView: {
         maxWidth: '60%',
         marginTop: 5,
         marginRight: '5%',
-        borderWidth: 0.4,
-        borderBottomLeftRadius: 150,
-        borderTopRightRadius: 150,
-        borderTopLeftRadius: 150
+        borderBottomLeftRadius: 20,
+        borderTopRightRadius: 20,
+        borderTopLeftRadius: 20
     },
     Chat_Message_Profile_Image: {
         height: 40,
