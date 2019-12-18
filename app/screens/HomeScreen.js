@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Image, AsyncStorage } from 'react-native'
 import firebase from 'react-native-firebase';
 import store from '../redux/store';
-import { MESSAGE_URL } from '../constants/url';
+import { MESSAGE_URL ,TOKEN_URL} from '../constants/url';
 import { GetDearImageAndName } from '../util/UserSetup';
 import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynamic_main_background_color, dynamic_side_drawer_item_background } from '../theme/DynamicStyles';
 import { EventRegister } from 'react-native-event-listeners';
@@ -17,8 +17,18 @@ class MessageDetail extends React.Component {
         this.setState({ UserId: state.users.accountId });
         //console.log(state.users.accountId);
         // this.setState({New_Line : this.props.newLine(this.props.message_detail.message.SendBy)}) ;
+        this.setFirebasePushToken(state.users.accountId);
     }
 
+    setFirebasePushToken=(acc_id)=>{
+        firebase.messaging().getToken().then((token)=>{
+            firebase.database().ref(TOKEN_URL + acc_id + "/").set({token : token}).catch((err)=>{
+                console.log("Set Token Error : " + err);
+            });
+        }).catch((err)=>{
+            console.log("Get Token Error : " + err);
+        });
+    }
     /*
     this.props.newLine === false means first line 
     this.props.newLine === true means second line 

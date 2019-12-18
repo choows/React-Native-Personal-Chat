@@ -19,9 +19,6 @@ export default class App extends React.Component {
       console.log("Cloud Message");
       console.log(message);
     });
-    this.removeNotificationListener = firebase.notifications().onNotification((notification) => {
-      this.refs.toast.show(notification.body, 1000);
-    });
   }
   async componentDidMount() {
     this.OnFirebaseCloudMessageReceive();

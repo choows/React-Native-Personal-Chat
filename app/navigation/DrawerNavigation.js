@@ -10,6 +10,7 @@ import * as UserAction from '../redux/action/user';
 import { Icon, Divider } from 'react-native-elements';
 import { MEMO_URL } from '../constants/url';
 import { dynamic_side_drawer_icon_color, dynamic_side_drawer_header_color, dynamic_main_background_color, dynamic_side_drawer_item_background } from '../theme/DynamicStyles';
+import { EventRegister } from 'react-native-event-listeners';
 class Seperator extends Component {
     render() {
 
@@ -33,6 +34,9 @@ class SideMenu extends Component {
     }
     componentDidMount() {
         this.GetCurrentDayMemo();
+        EventRegister.addEventListener("RefreshMemoWithDate" , (data)=>{
+            this.GetCurrentDayMemo();
+        });
     }
     GetCurrentDayMemo = () => {
         const date = new Date();

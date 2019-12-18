@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, Modal, TouchableHighlight, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Modal, TouchableHighlight, TouchableOpacity , Alert } from 'react-native';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import { EventRegister } from 'react-native-event-listeners';
 import { NavigationActions } from 'react-navigation';
@@ -19,11 +19,55 @@ class Memo extends React.Component {
             date: this.props.date
         });
     }
+    RemoveMemo=()=>{
+        console.log("Remove Memo");
+        const path = MEMO_URL + "Detail/" + this.props.date + "/" + this.props.keyword;
+        firebase.database().ref(path).remove().then(()=>{
+            EventRegister.emit("RefreshMemoWithDate" , this.props.date);
+        }).then(()=>{
+            this.RemoveColorFromDatabase();
+        })
+        .catch((err)=>{
+            console.log("Remove Memo With Error : " + err);
+        });
+    }
+    RemoveColorFromDatabase=()=>{
+            var yearmonthdatearr = this.props.date.split("-");
+            const yearmonth = yearmonthdatearr[0]+yearmonthdatearr[1];
+            const path = MEMO_URL + "Overall/" + yearmonth + "/" + this.props.date + "/" ;
+            firebase.database().ref(path).once('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    
+                    var colorarr = snapshot.toJSON()["color"].split(",");
+                    const new_arr = colorarr.filter((color)=>{
+                        color !== this.props.color;
+                    });
 
+                    firebase.database().ref(path).set({
+                        color: new_arr.toString(),
+                        YMD: this.props.date
+                    }).catch((err) => {
+                        console.log("Update Color Error : " + err);
+                    });
+                }
+            }).catch((err)=>{
+                console.log("Firebase Get Colro Value Error : " + err);
+            })
+            EventRegister.emit("RefreshMemoMonthWithDate" , yearmonth);
+    }
+    LongPress=()=>{
+        Alert.alert('Actions' , 'Please select one of the action.' , [
+            {text: 'Cancel' , onPress : ()=>console.log('Cancel...'), style : 'cancel'},
+            {text: 'View' , onPress: ()=>this.navigateToDetails()},
+            {text: 'Remove' , onPress: ()=>this.RemoveMemo()}
+        ] , {
+            cancelable : true
+        });
+    }
     render() {
         return (
             <View style={{ width: '100%', height: 40, flexDirection: 'row', alignContent: 'center', marginTop: 5, borderWidth: 0.1 }}>
-                <TouchableOpacity onPress={this.navigateToDetails} style={{ height: '100%', width: '100%', flexDirection: 'row', alignContent: 'stretch' }}>
+                <TouchableOpacity onPress={this.navigateToDetails} onLongPress={this.LongPress} style={{ height: '100%', width: '100%', flexDirection: 'row', alignContent: 'stretch' }}>
                     <View style={{ height: '100%', alignContent: 'center', justifyContent: 'center', alignItems: 'center' }}>
 
                         <View style={{ backgroundColor: this.props.color, borderRadius: 300, width: 30, height: 30, marginRight: 10, borderWidth: 1, borderColor: 'black' }}>
@@ -114,9 +158,13 @@ export default class MemoScreen extends React.Component {
         EventRegister.addEventListener("RefreshMemoWithDate", (yearmonthday) => {
             this.setUpMemoDetail(yearmonthday);
         });
+        EventRegister.addEventListener("RefreshMemoMonthWithDate" , (yearmonth)=>{
+            this.setUpMonthlyMemo(yearmonth);
+        });
     }
 
     setUpMemoDetail = (yearmonthday) => {
+        this.setState({ Memos: [] });
         firebase.database().ref(MEMO_URL + "Detail/" + yearmonthday + "/").once('value', (snapshot) => {
             if (snapshot.exists) {
                 if (snapshot.toJSON() !== null) {
@@ -136,9 +184,7 @@ export default class MemoScreen extends React.Component {
                     this.setState({ Memos: new_arr });
                 }
             }
-        })
-        // this.state.Memos.push(sample_memo);
-        // this.setState({ Memos: this.state.Memos });
+        });
     }
 
     setUpMonthlyMemo = (yearmonth) => {
@@ -151,7 +197,6 @@ export default class MemoScreen extends React.Component {
         */
         firebase.database().ref(MEMO_URL + "Overall/" + yearmonth).on('child_added', (snapshot) => {
             if (snapshot.exists) {
-                console.log("child_added called");
                 const result = snapshot.toJSON();
                 const color_arr = result['color'].split(',');
                 let json_arr = [];
@@ -172,7 +217,6 @@ export default class MemoScreen extends React.Component {
         });
         firebase.database().ref(MEMO_URL + "Overall/" + yearmonth).on('child_changed', (snapshot) => {
             if (snapshot.exists) {
-                console.log("child_changed called ");
                 const result = snapshot.toJSON();
                 const color_arr = result['color'].split(',');
                 let json_arr = [];
