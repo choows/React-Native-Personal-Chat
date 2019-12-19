@@ -39,6 +39,7 @@ class SideMenu extends Component {
         });
     }
     GetCurrentDayMemo = () => {
+        this.setState({Memos : []});
         const date = new Date();
         const correct_date = date.getDate() < 10 ? "0" + date.getDate().toString() : date.getDate().toString();
         const dayString = date.getFullYear().toString() + "-" + (date.getMonth() + 1).toString() + "-" + correct_date;
@@ -47,7 +48,6 @@ class SideMenu extends Component {
         this.GetMemoOn(path, dayString);
     }
     NavigateToMemoDetail = (memo) => {
-        //console.log("Memo Here");
 
         const path = MEMO_URL + "Detail/" + memo.date + "/" + memo.key;
 

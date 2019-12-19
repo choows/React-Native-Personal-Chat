@@ -20,7 +20,6 @@ class Memo extends React.Component {
         });
     }
     RemoveMemo=()=>{
-        console.log("Remove Memo");
         const path = MEMO_URL + "Detail/" + this.props.date + "/" + this.props.keyword;
         firebase.database().ref(path).remove().then(()=>{
             EventRegister.emit("RefreshMemoWithDate" , this.props.date);
@@ -31,6 +30,7 @@ class Memo extends React.Component {
             console.log("Remove Memo With Error : " + err);
         });
     }
+    
     RemoveColorFromDatabase=()=>{
             var yearmonthdatearr = this.props.date.split("-");
             const yearmonth = yearmonthdatearr[0]+yearmonthdatearr[1];
@@ -188,7 +188,6 @@ export default class MemoScreen extends React.Component {
     }
 
     setUpMonthlyMemo = (yearmonth) => {
-        console.log("YearMonth : " + yearmonth);
         /*
         {
                 '2019-11-28': {dots: [{color: 'green'}, {color: 'red'}, {color: 'yellow'}]},

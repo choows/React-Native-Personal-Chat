@@ -19,7 +19,7 @@ class MessageDetail extends React.Component {
         // this.setState({New_Line : this.props.newLine(this.props.message_detail.message.SendBy)}) ;
     }
 
-    
+
     /*
     this.props.newLine === false means first line 
     this.props.newLine === true means second line 
@@ -76,11 +76,13 @@ class MessageDetail extends React.Component {
                         </View>
                     )
                 }
-                break;
+            }
+            default: {
+                return (
+                    <View><Text>Data type not supported</Text></View>
+                )
             }
         }
-
-
     }
 }
 
@@ -102,6 +104,7 @@ export default class HomeScreen extends React.Component {
         Aniv_Validity: '',
         Aniv_Title: ''
     }
+
     setFirebasePushToken = (acc_id) => {
         firebase.messaging().getToken().then((token) => {
             firebase.database().ref(TOKEN_URL + acc_id + "/").set({ token: token }).catch((err) => {
@@ -111,6 +114,7 @@ export default class HomeScreen extends React.Component {
             console.log("Get Token Error : " + err);
         });
     }
+
     sendMessage = () => {
         const state = store.getState();
         if (this.state.message != "") {
@@ -137,15 +141,16 @@ export default class HomeScreen extends React.Component {
         })
     }
 
-    SetUpSelfInfo =()=>{
+    SetUpSelfInfo = () => {
         const state = store.getState();
         firebase.database().ref('Users/' + state.users.accountId).set({
-            ProfileImage : state.users.ProfileImage,
-            DisplayName : state.users.displayName
-        }).catch((err)=>{
+            ProfileImage: state.users.ProfileImage,
+            DisplayName: state.users.displayName
+        }).catch((err) => {
             console.log("Setup Self Info Error : " + err);
         });
     }
+
     SetUpOppoDetails = () => {
         const state = store.getState();
         firebase.database().ref('Users/').once('value', (snapshot) => {
@@ -163,9 +168,11 @@ export default class HomeScreen extends React.Component {
             console.log("Get Dear Detail Error : " + err);
         });
     }
+
     SetToInitialState = () => {
         this.setState({ chat_message: [], oppoImage: '', oppoDisplay_Name: '' });
     }
+
     /**
      * when last line is self , then his line is oppo then return true 
      * */
@@ -175,7 +182,7 @@ export default class HomeScreen extends React.Component {
     }
     checkAnniversary = () => {
         const currentDate = new Date();
-            if (currentDate.getDate() == 13) {
+        if (currentDate.getDate() == 13) {
             const ani_date = new Date("2019-05-13");
             var difference = currentDate - ani_date;
             var day = difference / (1000 * 60 * 60 * 24);
@@ -192,8 +199,8 @@ export default class HomeScreen extends React.Component {
             }
             this.showAnniversary(year, month);
         }
-
     }
+
     GetNum = (count) => {
         switch (count) {
             case "1":
@@ -214,7 +221,9 @@ export default class HomeScreen extends React.Component {
                 }
         }
     }
+
     Aniversary_path = "";
+
     showAnniversary = (year, month) => {
         const state = store.getState();
         const UID = state.users.accountId;
@@ -230,19 +239,10 @@ export default class HomeScreen extends React.Component {
         firebase.database().ref(path).once('value', (snapshot) => {
             if (!snapshot.exists()) {
                 if (UID === "5EmUBjYLKLWM3M5PdB9O9BH7OXj1") {
-                    //self
                     this.Aniversary_path = path;
-                    /**
-                     *  Aniv_Word : '',
-                        Aniv_Voucher : '',
-                        Aniv_Validity : '',
-                        Aniv_Title : ''
-                     */
                     this.setState({ Aniv_Title: Title, Aniv_OverLay: true });
                 }
             } else {
-                //if exist 
-                //console.log(snapshot.toJSON());
                 if (UID === "QzALepVqIaZ6b3rkk7r685aQ6Ow2") {
                     const result = snapshot.toJSON();
                     if (result["Status"] !== "Received") {
@@ -262,14 +262,13 @@ export default class HomeScreen extends React.Component {
     }
 
     ConfirmSubmitVoucher = () => {
-        
         firebase.database().ref(this.Aniversary_path).set({
             Words: this.state.Aniv_Word,
             Voucher: this.state.Aniv_Voucher,
             Validity: this.state.Aniv_Validity,
             Read: 'false'
         }).then(() => {
-            EventRegister.emit("Toast" , "Done Setup Anniversary.");
+            EventRegister.emit("Toast", "Done Setup Anniversary.");
             this.setState({ Aniv_OverLay: false });
         }).catch((err) => {
             console.log("Setup Aniversary Error : " + err);
@@ -286,6 +285,7 @@ export default class HomeScreen extends React.Component {
             { cancelable: true }
         )
     }
+
     OnAnivPresentChange = (status) => {
         const currentDate = new Date();
         const ani_date = new Date("2019-05-13");
@@ -304,19 +304,19 @@ export default class HomeScreen extends React.Component {
         }
 
         const path = ANI_URL + year.toString() + month.toString();
-        
+
         firebase.database().ref(path).set({
             Words: this.state.Aniv_Word,
             Voucher: this.state.Aniv_Voucher,
             Validity: this.state.Aniv_Validity,
             Status: status
         }).then(() => {
-            //EventRegister.emit("Toast" , "Done Setup Anniversary.");
             this.setState({ Aniv_OverLay: false });
         }).catch((err) => {
             console.log("Setup Aniversary Error : " + err);
         })
     }
+
     componentDidMount() {
         const state = store.getState();
         this.setFirebasePushToken(state.users.accountId);
@@ -336,6 +336,7 @@ export default class HomeScreen extends React.Component {
             }
         });
     }
+
     OnNewImageClicked = () => {
         ImagePicker.showImagePicker({
             title: 'Photo',
@@ -350,6 +351,7 @@ export default class HomeScreen extends React.Component {
             }
         })
     }
+
     UploadToFirebaseStorage = (path) => {
         const currentDate = new Date().getTime();
         let storage_path = currentDate.toString();
@@ -378,13 +380,16 @@ export default class HomeScreen extends React.Component {
             console.log("Send Message Error : " + err);
         });
     }
+
     GetMonthString = (month) => {
         const monthNames = ["January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
         ];
         return monthNames[month];
     }
+
     time = "";
+
     CheckTimer = (timeStamp) => {
         const NumtimeStamp = parseInt(timeStamp);
 
@@ -403,12 +408,13 @@ export default class HomeScreen extends React.Component {
             this.time = NumtimeStamp;
             const date = new Date(NumtimeStamp);
             return (
-                <View style={{ width: '100%', alignContent: 'center', alignItems: 'center' }}><Text>{date.getHours() + ":" + date.getMinutes()}</Text></View>
+                <View style={{ width: '100%', alignContent: 'center', alignItems: 'center' }}><Text>{date.getHours() + ":" + (date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes())}</Text></View>
             )
         }
         this.time = NumtimeStamp;
         return null;
     }
+
     UploadToFirebaseDatabase = (path, url) => {
         const currentDate = new Date().getTime().toString();
         firebase.database().ref(IMAGE_URL + "/" + currentDate).set({
@@ -447,7 +453,7 @@ export default class HomeScreen extends React.Component {
                             </View>
                             :
                             <View style={{ width: '100%', height: '100%', alignContent: 'center', alignItems: 'center', justifyContent: 'center' }}>
-                                <Text style={{ fontWeight: 'bold', marginTop : '3%' }}>{this.state.Aniv_Title}</Text>
+                                <Text style={{ fontWeight: 'bold', marginTop: '3%' }}>{this.state.Aniv_Title}</Text>
                                 <Text>Dear , Here is what i have to tell u in this Anniversary ....</Text>
                                 <Text>{this.state.Aniv_Word}</Text>
                                 <Text>Besides , I also prepared some present for you ...</Text>
@@ -455,18 +461,17 @@ export default class HomeScreen extends React.Component {
                                 <Text>Which is valid until ...</Text>
                                 <Text style={{ fontWeight: 'bold' }}>{this.state.Aniv_Validity}</Text>
                                 <Text>Haha , quite ugly design right ...</Text>
-                                <View style={{ marginTop: 15, justifyContent: 'center', alignItems: 'center', alignContent: 'center', flexDirection : 'row' }}>
-                                    <TouchableOpacity onPress={() => { this.OnAnivPresentChange("Received") }} style={{ padding: 10, marginTop: 10 , borderWidth : 0.2 , borderRadius : 20}}>
+                                <View style={{ marginTop: 15, justifyContent: 'center', alignItems: 'center', alignContent: 'center', flexDirection: 'row' }}>
+                                    <TouchableOpacity onPress={() => { this.OnAnivPresentChange("Received") }} style={{ padding: 10, marginTop: 10, borderWidth: 0.2, borderRadius: 20 }}>
                                         <Text style={{ fontWeight: 'bold' }}>Received</Text>
                                     </TouchableOpacity>
-                                    <View style={{width : '15%'}}>
+                                    <View style={{ width: '15%' }}>
 
                                     </View>
-                                    <TouchableOpacity onPress={() => { this.OnAnivPresentChange("Later") }} style={{ padding: 10, marginTop: 10 , borderWidth : 0.2 , borderRadius : 20}}>
+                                    <TouchableOpacity onPress={() => { this.OnAnivPresentChange("Later") }} style={{ padding: 10, marginTop: 10, borderWidth: 0.2, borderRadius: 20 }}>
                                         <Text style={{ fontWeight: 'bold' }}>Later</Text>
                                     </TouchableOpacity>
                                 </View>
-
                             </View>
                     }
                 </Overlay>
