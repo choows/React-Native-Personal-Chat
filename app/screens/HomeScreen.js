@@ -304,8 +304,7 @@ export default class HomeScreen extends React.Component {
         }
 
         const path = ANI_URL + year.toString() + month.toString();
-
-        firebase.database().ref(path).set({
+        firebase.database().ref(path).update({
             Words: this.state.Aniv_Word,
             Voucher: this.state.Aniv_Voucher,
             Validity: this.state.Aniv_Validity,
