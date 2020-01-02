@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableHighlight, Image, ScrollView, TextInput, Modal, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableHighlight, Image, ScrollView, TextInput, Modal, TouchableOpacity, Platform } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { MemoColor } from '../constants/ColorCode';
 import { ColorPicker, TriangleColorPicker, fromHsv } from 'react-native-color-picker'
@@ -50,7 +50,7 @@ export default class NewMemoScreen extends React.Component {
     GetCurrentDateColor = (datestring) => {
         this.setState({ current_date_setted_color: "" });
         const date = new Date(datestring);
-        const yearmonth = date.getFullYear().toString() + (date.getMonth() + 1).toString();
+        const yearmonth = date.getFullYear().toString() + this.ConvertMonthWithZero(date.getMonth() + 1);
         const yearmonthday = this.DateDisplay(datestring);
         firebase.database().ref(MEMO_URL + "Overall/" + yearmonth + "/" + yearmonthday + "/").once('value', (snapshot) => {
             if (snapshot.exists()) {
@@ -65,7 +65,7 @@ export default class NewMemoScreen extends React.Component {
         let datestr = new Date(dateString);
         const correct_date = datestr.getDate() < 10 ? "0" + datestr.getDate().toString() : datestr.getDate().toString();
 
-        return datestr.getFullYear() + "-" + (datestr.getUTCMonth() + 1) + "-" + correct_date;
+        return datestr.getFullYear() + "-" + this.ConvertMonthWithZero(datestr.getUTCMonth() + 1) + "-" + correct_date;
     }
     ColorPicked = (colorcode) => {
         this.setState({ selected_color: colorcode });
@@ -86,7 +86,7 @@ export default class NewMemoScreen extends React.Component {
     SubmitNewMemo = () => {
         if (this.state.text_title !== "") {
             const date_submit = new Date(this.state.from_date);
-            const yearmonth = date_submit.getFullYear().toString() + (date_submit.getMonth() + 1).toString();
+            const yearmonth = date_submit.getFullYear().toString() + this.ConvertMonthWithZero(date_submit.getMonth() + 1);
             const yearmonthday = this.DateDisplay(this.state.from_date);
             //'2019-11-28': {dots: [{color: 'green'}, {color: 'red'}, {color: 'yellow'}]}
             const arry_color = this.state.current_date_setted_color.split(',');
@@ -110,10 +110,17 @@ export default class NewMemoScreen extends React.Component {
         }
 
     }
+    ConvertMonthWithZero=(month)=>{
+        if(month < 10){
+            return "0"+month.toString();
+        }else{
+            return month.toString();
+        }
+    }
     SubmitMemoDetail = () => {
         const date = new Date(this.state.from_date);
         const correct_date = date.getDate() < 10 ? "0" + date.getDate().toString() : date.getDate().toString();
-        const yearmonthday = date.getFullYear() + '-' + (date.getMonth() + 1).toString() + "-" + correct_date;
+        const yearmonthday = date.getFullYear() + '-' + this.ConvertMonthWithZero(date.getMonth() + 1) + "-" + correct_date;
         const path = MEMO_URL + "Detail/" + yearmonthday + "/";
         firebase.database().ref(path).push({
             title: this.state.text_title,
@@ -148,11 +155,25 @@ export default class NewMemoScreen extends React.Component {
                     </TouchableOpacity>
 
                     {
-                        this.state.display_from && <DateTimePicker
-                            value={new Date(this.state.from_date)}
-                            mode={"date"}
-                            display="calendar"
-                            onChange={this.setFrom_date} />
+                        Platform.OS === 'ios' ?
+                            <Modal
+                                visible={this.state.display_from}
+                                onRequestClose={() => { this.setState({ display_from: false }) }}
+                                transparent={false}>
+                                <View>
+                                    <DateTimePicker
+                                        value={new Date(this.state.from_date)}
+                                        mode={"date"}
+                                        display="calendar"
+                                        onChange={this.setFrom_date} />
+                                </View>
+                            </Modal>
+                            :
+                            this.state.display_from && <DateTimePicker
+                                value={new Date(this.state.from_date)}
+                                mode={"date"}
+                                display="calendar"
+                                onChange={this.setFrom_date} />
                     }
                 </View>
                 <View style={{ flexDirection: 'row', height: '10%', width: '95%', alignContent: 'center', alignItems: 'center', margin: '2%' }}>
@@ -163,7 +184,7 @@ export default class NewMemoScreen extends React.Component {
                             )
                         }
                     </ScrollView>
-                    <View style={{ width: '10%' , flexDirection : 'row-reverse' }}>
+                    <View style={{ width: '10%', flexDirection: 'row-reverse' }}>
                         <View style={{
                             backgroundColor: this.state.selected_color,
                             borderRadius: 300,
@@ -218,8 +239,8 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         height: '100%',
-        alignItems : 'center',
-        alignContent : 'center',
+        alignItems: 'center',
+        alignContent: 'center',
         backgroundColor: dynamic_main_background_color()
     },
     SectionView: {

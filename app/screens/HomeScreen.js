@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Image, AsyncStorage, Alert } from 'react-native'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Image, AsyncStorage, Alert, Platform } from 'react-native'
 import firebase from 'react-native-firebase';
 import store from '../redux/store';
 import { MESSAGE_URL, TOKEN_URL, ANI_URL } from '../constants/url';
@@ -346,7 +346,11 @@ export default class HomeScreen extends React.Component {
             quality: 1,
         }, (response) => {
             if (!response.didCancel) {
-                this.UploadToFirebaseStorage(response.path);
+                if(Platform.OS === "ios"){
+                    this.UploadToFirebaseStorage(response.uri);
+                }else{
+                    this.UploadToFirebaseStorage(response.path);
+                }
             }
         })
     }

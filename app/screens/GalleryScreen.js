@@ -34,9 +34,17 @@ export default class GalleryScreen extends React.Component {
                 cancelButtonTitle: 'Cancel',
                 mediaType: 'photo',
                 quality: 1,
+                storageOptions : {
+                    cameraRoll : true,
+                }
             }, (response) => {
                 if (!response.didCancel) {
-                    this.UploadToFirebaseStorage(response.path);
+                    if(Platform.OS === "ios"){
+                        this.UploadToFirebaseStorage(response.uri);
+                    }else{
+                        this.UploadToFirebaseStorage(response.path);
+                    }
+                    //this.UploadToFirebaseStorage(response.path);
                 }
             })
         })

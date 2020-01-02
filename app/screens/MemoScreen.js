@@ -137,11 +137,18 @@ export default class MemoScreen extends React.Component {
         });
 
     }
+    ConvertMonthWithZero=(month)=>{
+        if(month < 10){
+            return "0"+month.toString();
+        }else{
+            return month.toString();
+        }
+    }
     componentDidMount = () => {
         const currentDate = new Date();
         // currentDate.setMonth(currentDate.getMonth());
         const currentDateString = currentDate.getFullYear() + "-" + (currentDate.getMonth() + 1).toString() + "-" + currentDate.getDate();
-        this.setUpMonthlyMemo(currentDate.getFullYear().toString() + (currentDate.getMonth() + 1).toString());
+        this.setUpMonthlyMemo(currentDate.getFullYear().toString() + this.ConvertMonthWithZero(currentDate.getMonth() + 1));
         const nxtyear = new Date();
         nxtyear.setMonth(nxtyear.getMonth() + 1);
         nxtyear.setDate(nxtyear.getDate() + 365);
@@ -205,7 +212,7 @@ export default class MemoScreen extends React.Component {
                             color: color
                         });
                     }
-                })
+                });
                 this.state.markedDates[result['YMD']] = {
                     dots: json_arr
                 };

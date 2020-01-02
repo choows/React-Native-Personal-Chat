@@ -38,11 +38,18 @@ class SideMenu extends Component {
             this.GetCurrentDayMemo();
         });
     }
+    ConvertMonthWithZero=(month)=>{
+        if(month < 10){
+            return "0"+month.toString();
+        }else{
+            return month.toString();
+        }
+    }
     GetCurrentDayMemo = () => {
         this.setState({Memos : []});
         const date = new Date();
         const correct_date = date.getDate() < 10 ? "0" + date.getDate().toString() : date.getDate().toString();
-        const dayString = date.getFullYear().toString() + "-" + (date.getMonth() + 1).toString() + "-" + correct_date;
+        const dayString = date.getFullYear().toString() + "-" + this.ConvertMonthWithZero(date.getMonth() + 1) + "-" + correct_date;
         const path = MEMO_URL + "Detail/" + dayString + "/";
         this.GetMemoOnce(path, dayString);
         this.GetMemoOn(path, dayString);
